@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="100%" height="100%">
+    <!-- Base grass (transparent) -->
+    <!-- <rect width="1200" height="800" fill="#2e7d32" /> -->
+    
+    <!-- Outer boundary -->
+    <rect x="50" y="50" width="1100" height="700" fill="none" stroke="white" stroke-width="8"/>
+    
+    <!-- Halfway line -->
+    <line x1="600" y1="50" x2="600" y2="750" stroke="white" stroke-width="8"/>
+    
+    <!-- Center circle -->
+    <circle cx="600" cy="400" r="100" fill="none" stroke="white" stroke-width="8"/>
+    
+    <!-- Center spot -->
+    <circle cx="600" cy="400" r="10" fill="white"/>
+    
+    <!-- Left Penalty Area -->
+    <rect x="50" y="200" width="180" height="400" fill="none" stroke="white" stroke-width="8"/>
+    
+    <!-- Left Goal Area -->
+    <rect x="50" y="300" width="60" height="200" fill="none" stroke="white" stroke-width="8"/>
+    
+    <!-- Left Penalty Spot -->
+    <circle cx="170" cy="400" r="8" fill="white"/>
+    
+    <!-- Left Penalty Arc -->
+    <path d="M 230 330 A 100 100 0 0 1 230 470" fill="none" stroke="white" stroke-width="8"/>
+    
+    <!-- Right Penalty Area -->
+    <rect x="970" y="200" width="180" height="400" fill="none" stroke="white" stroke-width="8"/>
+    
+    <!-- Right Goal Area -->
+    <rect x="1090" y="300" width="60" height="200" fill="none" stroke="white" stroke-width="8"/>
+    
+    <!-- Right Penalty Spot -->
+    <circle cx="1030" cy="400" r="8" fill="white"/>
+    
+    <!-- Right Penalty Arc -->
+    <path d="M 970 330 A 100 100 0 0 0 970 470" fill="none" stroke="white" stroke-width="8"/>
+</svg>

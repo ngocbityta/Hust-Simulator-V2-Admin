@@ -1,0 +1,16 @@
+services:
+  admin-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hustsim-admin-ui
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    networks:
+      - hustsim-network
+
+networks:
+  hustsim-network:
+    external: true
+    name: server_default
