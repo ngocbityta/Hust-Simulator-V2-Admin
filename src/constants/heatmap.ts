@@ -44,6 +44,7 @@ export const STATUS_COLOR: Record<ConnectionStatus, string> = {
   connecting: '#facc15',
   disconnected: '#ef4444',
   forecast: '#a78bfa',
+  simulation: '#f59e0b',
 };
 
 export const STATUS_LABEL: Record<ConnectionStatus, string> = {
@@ -51,4 +52,5 @@ export const STATUS_LABEL: Record<ConnectionStatus, string> = {
   connecting: 'Connecting…',
   disconnected: 'Offline',
   forecast: 'Forecast',
+  simulation: '🔬 Simulation',
 };

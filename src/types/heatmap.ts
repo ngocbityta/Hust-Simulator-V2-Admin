@@ -24,9 +24,11 @@ export interface HeatmapResponse {
   cells: CellData[];
   globalReasons?: string[];
   poiReasons?: Record<string, string[]>;
+  simulationApplied?: boolean;
+  simulationReasons?: string[];
 }
 
-export type ConnectionStatus = 'live' | 'connecting' | 'disconnected' | 'forecast';
+export type ConnectionStatus = 'live' | 'connecting' | 'disconnected' | 'forecast' | 'simulation';
 
 export interface PoiData {
   id: string;

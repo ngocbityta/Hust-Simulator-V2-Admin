@@ -65,36 +65,48 @@ export const BuildingsPage: React.FC = () => {
             Failed to load buildings. Please try again.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="text-zinc-400 border-b border-zinc-800">
-                  <th className="pb-4 font-medium px-4">Name</th>
-                  <th className="pb-4 font-medium px-4 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {buildings.map((building: any) => (
-                  <tr key={building.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/20 transition-colors">
-                    <td className="py-4 px-4 font-medium text-zinc-200">
-                      {building.name || 'Unknown'}
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <button className="text-sm text-zinc-400 hover:text-emerald-400 px-3 py-1.5 rounded-lg hover:bg-emerald-400/10 transition-colors">
-                        Edit
+          <div className="flex flex-col">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {buildings.map((building: any) => (
+                <div key={building.id} className="bg-zinc-950/50 border border-zinc-800 rounded-xl overflow-hidden hover:border-emerald-500/50 transition-all hover:shadow-lg hover:shadow-emerald-500/10 flex flex-col group">
+                  {/* Image Placeholder */}
+                  <div className="h-48 bg-zinc-900 flex items-center justify-center relative overflow-hidden border-b border-zinc-800">
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent z-10" />
+                    <Building2 className="text-zinc-700/50 group-hover:scale-110 transition-transform duration-500" size={64} />
+                    <span className="absolute bottom-3 left-4 z-20 text-xs font-medium text-zinc-500 uppercase tracking-wider bg-zinc-950/80 px-2 py-1 rounded">
+                      Chưa có hình ảnh
+                    </span>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="p-5 flex-1 flex flex-col">
+                    <h3 className="text-xl font-bold text-zinc-100 mb-2 truncate">
+                      {building.name || 'Unknown Building'}
+                    </h3>
+                    <p className="text-sm text-zinc-400 mb-4 flex-1 line-clamp-2">
+                      Thông tin chung của khu vực đang được cập nhật. Bạn có thể xem chi tiết hoặc quản lý các phòng bên trong.
+                    </p>
+                    
+                    {/* Actions */}
+                    <div className="flex items-center gap-2 mt-auto pt-4 border-t border-zinc-800/50">
+                      <button className="flex-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-sm font-medium py-2 rounded-lg transition-colors">
+                        Quản lý Phòng
                       </button>
-                    </td>
-                  </tr>
-                ))}
-                {buildings.length === 0 && (
-                  <tr>
-                    <td colSpan={2} className="py-10 text-center text-zinc-500">
-                      No buildings found matching your search.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                      <button className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium py-2 px-4 rounded-lg transition-colors">
+                        Sửa
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {buildings.length === 0 && (
+              <div className="py-20 text-center text-zinc-500 bg-zinc-950/30 rounded-xl border border-zinc-800/50 mb-8">
+                <Building2 className="mx-auto mb-3 text-zinc-700" size={48} />
+                <p>Không tìm thấy tòa nhà nào.</p>
+              </div>
+            )}
             
             <Pagination 
               currentPage={page} 

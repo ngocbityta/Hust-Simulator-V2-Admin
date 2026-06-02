@@ -17,7 +17,6 @@ const NAV_ITEMS = [
   { label: 'Dashboard', path: '/', icon: BarChart3 },
   { label: 'Heatmap', path: '/heatmap', icon: Map },
   { label: 'Buildings', path: '/buildings', icon: Building2 },
-  { label: 'Rooms', path: '/rooms', icon: Box },
   { label: 'Users', path: '/users', icon: Users },
   { label: 'Events', path: '/events', icon: CalendarDays },
   { label: 'Recurring Events', path: '/recurring-events', icon: CalendarRange },

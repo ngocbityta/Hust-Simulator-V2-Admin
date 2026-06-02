@@ -13,6 +13,10 @@ export function useHeatmapData() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [globalReasons, setGlobalReasons] = useState<string[]>([]);
   const [poiReasons, setPoiReasons] = useState<Record<string, string[]>>({});
+  const [paused, setPaused] = useState(false);
+
+  const pause = useCallback(() => setPaused(true), []);
+  const resume = useCallback(() => setPaused(false), []);
 
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -71,6 +75,8 @@ export function useHeatmapData() {
 
   // Live / Forecast logic
   useEffect(() => {
+    if (paused) return;
+
     const customMs = targetDateStr ? new Date(targetDateStr).getTime() : undefined;
 
     if (customMs && !isNaN(customMs)) {
@@ -135,7 +141,7 @@ export function useHeatmapData() {
         ws.close();
       }
     };
-  }, [targetDateStr, fetchHttp, updateState]);
+  }, [targetDateStr, fetchHttp, updateState, paused]);
 
   // Compute expected people per building from heatmap intents
   const buildingDensity = useMemo(() => {
@@ -163,5 +169,7 @@ export function useHeatmapData() {
     isLive: !targetDateStr,
     globalReasons,
     poiReasons,
+    pause,
+    resume,
   };
 }
