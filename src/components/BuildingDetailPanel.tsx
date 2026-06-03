@@ -9,6 +9,7 @@ interface BuildingDetailPanelProps {
 }
 
 import React from 'react';
+import { useFetch } from '../hooks/useFetch';
 
 export default React.memo(function BuildingDetailPanel({
   selectedPoi,
@@ -34,6 +35,8 @@ export default React.memo(function BuildingDetailPanel({
     ...eventsForPoi.map(ev => `Đang diễn ra sự kiện: ${ev.name}`),
   ];
 
+  const { data: buildingData } = useFetch<any>(`/buildings/${selectedPoi.id}`);
+
   return (
     <div
       style={{
@@ -47,20 +50,74 @@ export default React.memo(function BuildingDetailPanel({
         border: '1px solid rgba(255,255,255,0.08)',
         borderRadius: 14,
         overflow: 'hidden',
+        boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)',
       }}
     >
-      <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      {/* Building Image Cover */}
+      <div style={{ width: '100%', height: 140, position: 'relative', backgroundColor: '#18181b' }}>
+        {selectedPoi.id === 'empty-space-click' ? (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#27272a', color: '#a1a1aa', fontSize: 18, fontWeight: 600 }}>
+            Bãi đất trống
+          </div>
+        ) : (
+          <img 
+            src={`https://picsum.photos/seed/${selectedPoi.id}/320/140`} 
+            alt={selectedPoi.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={(e) => {
+              e.currentTarget.src = 'https://placehold.co/320x140/18181b/52525b?text=No+Image';
+            }}
+          />
+        )}
+        {/* Gradient overlay to make text more readable if we ever put text over it, and to blend with panel */}
+        <div style={{ 
+          position: 'absolute', 
+          inset: 0, 
+          background: 'linear-gradient(to top, rgba(15,15,20,1) 0%, rgba(15,15,20,0.4) 60%, transparent 100%)' 
+        }} />
+        
+        {/* Close Button overlaying the image */}
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            background: 'rgba(15,15,20,0.6)',
+            backdropFilter: 'blur(4px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: '#e4e4e7',
+            cursor: 'pointer',
+            fontSize: 14,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10,
+            transition: 'all 0.2s',
+          }}
+          onMouseOver={(e) => e.currentTarget.style.background = 'rgba(15,15,20,0.8)'}
+          onMouseOut={(e) => e.currentTarget.style.background = 'rgba(15,15,20,0.6)'}
+        >
+          ✕
+        </button>
+      </div>
+
+      <div style={{ padding: '0 16px 16px 16px', position: 'relative', marginTop: '-20px', zIndex: 5 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <div
               style={{
-                fontSize: 15,
+                fontSize: 17,
                 fontWeight: 700,
                 color: '#fafafa',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                maxWidth: '240px',
+                maxWidth: '280px',
+                textShadow: '0 2px 4px rgba(0,0,0,0.5)',
               }}
             >
               <span 
@@ -79,24 +136,6 @@ export default React.memo(function BuildingDetailPanel({
               {selectedPoi.lat.toFixed(5)}, {selectedPoi.lng.toFixed(5)}
             </div>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              width: 26,
-              height: 26,
-              borderRadius: 8,
-              background: 'rgba(255,255,255,0.06)',
-              border: 'none',
-              color: '#71717a',
-              cursor: 'pointer',
-              fontSize: 14,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            ✕
-          </button>
         </div>
       </div>
       <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -130,6 +169,21 @@ export default React.memo(function BuildingDetailPanel({
           <div style={{ fontSize: 9, color: '#52525b' }}>người</div>
         </div>
 
+        {buildingData && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
+              <div style={{ fontSize: 10, color: '#a1a1aa', marginBottom: 4 }}>Số tầng</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#fafafa' }}>{buildingData.floorCount || 0}</div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
+              <div style={{ fontSize: 10, color: '#a1a1aa', marginBottom: 4 }}>Số phòng</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#fafafa' }}>{buildingData.roomCount || 0}</div>
+            </div>
+          </div>
+        )}
+
+
+        {/* ── Dynamic AI model predicting overlay ── */}
         {allReasons.length > 0 && (
           <div style={{ marginTop: 8, padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: '#e4e4e7', marginBottom: 8 }}>Nguyên nhân:</div>

@@ -43,23 +43,23 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
   const endItem = totalElements ? Math.min((currentPage + 1) * pageSize, totalElements) : (currentPage + 1) * pageSize;
 
   return (
-    <div className="flex items-center justify-between border-t border-zinc-800/50 bg-zinc-900/50 px-4 py-3 sm:px-6 mt-4 rounded-b-xl">
+    <div className="flex items-center justify-between border-t border-zinc-200/80 dark:border-zinc-800/50 bg-zinc-50/50 dark:bg-zinc-900/50 px-4 py-3 sm:px-6 mt-4 rounded-b-xl">
       {/* Mobile */}
       <div className="flex flex-1 justify-between sm:hidden">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 0}
-          className="relative inline-flex items-center rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative inline-flex items-center rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Previous
         </button>
-        <span className="inline-flex items-center text-sm text-zinc-400">
+        <span className="inline-flex items-center text-sm text-zinc-500 dark:text-zinc-400">
           {currentPage + 1} / {totalPages}
         </span>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages - 1}
-          className="relative ml-3 inline-flex items-center rounded-lg border border-zinc-700 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="relative ml-3 inline-flex items-center rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next
         </button>
@@ -68,17 +68,17 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
       {/* Desktop */}
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-zinc-400">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {totalElements !== undefined ? (
               <>
-                Showing <span className="font-medium text-zinc-200">{startItem}</span> to{' '}
-                <span className="font-medium text-zinc-200">{endItem}</span> of{' '}
-                <span className="font-medium text-zinc-200">{totalElements}</span> results
+                Showing <span className="font-medium text-zinc-800 dark:text-zinc-200">{startItem}</span> to{' '}
+                <span className="font-medium text-zinc-800 dark:text-zinc-200">{endItem}</span> of{' '}
+                <span className="font-medium text-zinc-800 dark:text-zinc-200">{totalElements}</span> results
               </>
             ) : (
               <>
-                Page <span className="font-medium text-zinc-200">{currentPage + 1}</span> of{' '}
-                <span className="font-medium text-zinc-200">{totalPages}</span>
+                Page <span className="font-medium text-zinc-800 dark:text-zinc-200">{currentPage + 1}</span> of{' '}
+                <span className="font-medium text-zinc-800 dark:text-zinc-200">{totalPages}</span>
               </>
             )}
           </p>
@@ -89,7 +89,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
             <button
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 0}
-              className="relative inline-flex items-center rounded-l-lg px-2.5 py-2 text-zinc-400 ring-1 ring-inset ring-zinc-700 hover:bg-zinc-800 hover:text-zinc-200 focus:z-20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center rounded-l-lg px-2.5 py-2 text-zinc-500 dark:text-zinc-400 ring-1 ring-inset ring-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-800 dark:hover:text-zinc-200 focus:z-20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
@@ -110,7 +110,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
                   className={`relative inline-flex items-center px-3.5 py-2 text-sm font-medium ring-1 ring-inset ring-zinc-700 transition-colors focus:z-20 ${
                     pageNum === currentPage
                       ? 'bg-emerald-500/20 text-emerald-400 z-10 ring-emerald-500/40'
-                      : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-800 dark:hover:text-zinc-200'
                   }`}
                 >
                   {pageNum + 1}
@@ -122,7 +122,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
             <button
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages - 1}
-              className="relative inline-flex items-center rounded-r-lg px-2.5 py-2 text-zinc-400 ring-1 ring-inset ring-zinc-700 hover:bg-zinc-800 hover:text-zinc-200 focus:z-20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center rounded-r-lg px-2.5 py-2 text-zinc-500 dark:text-zinc-400 ring-1 ring-inset ring-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-800 dark:hover:text-zinc-200 focus:z-20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronRight className="h-4 w-4" />
             </button>

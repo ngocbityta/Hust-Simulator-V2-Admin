@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   if (isLoading) {
-    return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-500">Loading...</div>;
+    return <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center text-zinc-500">Loading...</div>;
   }
 
   return (

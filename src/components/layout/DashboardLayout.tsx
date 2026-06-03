@@ -8,11 +8,11 @@ export const DashboardLayout: React.FC = () => {
   const { user, logout } = useAuth();
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-50 font-sans overflow-hidden">
+    <div className="flex h-screen bg-white dark:bg-zinc-950 text-zinc-50 font-sans overflow-hidden">
       <Sidebar />
       <main className="flex-1 flex flex-col min-w-0 relative">
         {/* Top Navigation Header */}
-        <header className="h-16 px-6 lg:px-8 border-b border-zinc-800/50 flex items-center justify-between bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30">
+        <header className="h-16 px-6 lg:px-8 border-b border-zinc-200/80 dark:border-zinc-800/50 flex items-center justify-between bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md sticky top-0 z-30">
           <div className="flex-1 flex items-center">
             {/* Optional breadcrumbs or page title could go here */}
             <div className="hidden md:flex relative group">
@@ -20,26 +20,26 @@ export const DashboardLayout: React.FC = () => {
               <input 
                 type="text" 
                 placeholder="Global search..." 
-                className="w-64 pl-10 pr-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 transition-all text-sm text-zinc-200 placeholder-zinc-500 focus:w-80"
+                className="w-64 pl-10 pr-4 py-2 bg-zinc-50/50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 transition-all text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-500 focus:w-80"
               />
             </div>
           </div>
           {/* Right Section */}
           <div className="flex items-center gap-6">
-            <button className="relative p-2 text-zinc-400 hover:text-emerald-400 transition-colors rounded-full hover:bg-emerald-400/10">
+            <button className="relative p-2 text-zinc-500 dark:text-zinc-400 hover:text-emerald-400 transition-colors rounded-full hover:bg-emerald-400/10">
               <Bell size={20} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full"></span>
             </button>
             
-            <div className="h-8 w-px bg-zinc-800"></div>
+            <div className="h-8 w-px bg-zinc-100 dark:bg-zinc-800"></div>
             
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-end">
-                <span className="text-sm font-medium text-zinc-200">{user?.username || 'Admin'}</span>
+                <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{user?.username || 'Admin'}</span>
                 <span className="text-xs text-emerald-500 font-medium tracking-wider">{user?.role}</span>
               </div>
               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-emerald-500 to-blue-500 p-0.5 shadow-lg shadow-emerald-500/20">
-                <div className="w-full h-full bg-zinc-900 rounded-full flex items-center justify-center border-2 border-zinc-900">
+                <div className="w-full h-full bg-zinc-50 dark:bg-zinc-900 rounded-full flex items-center justify-center border-2 border-zinc-900">
                   <span className="text-emerald-500 font-bold text-sm">
                     {user?.username ? user.username.charAt(0).toUpperCase() : 'A'}
                   </span>

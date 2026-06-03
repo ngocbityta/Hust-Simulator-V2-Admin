@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import DeckGL from '@deck.gl/react';
 import { HeatmapLayer } from '@deck.gl/aggregation-layers';
 import { ScatterplotLayer, PolygonLayer, TextLayer, PathLayer } from '@deck.gl/layers';
-import ReactMap from 'react-map-gl/maplibre';
+import ReactMap, { Marker } from 'react-map-gl/maplibre';
 import maplibregl from 'maplibre-gl';
 import { useHeatmapData } from '../hooks/useHeatmapData';
 import { useSimulation } from '../hooks/useSimulation';
@@ -436,8 +436,7 @@ export default function HeatmapViewer() {
           stroked: true,
           filled: true,
         }),
-
-
+        
         // ─── 0. Campus Mask (Inverted Polygon) ───
         new PolygonLayer({
           id: 'campus-mask-layer',
@@ -503,6 +502,7 @@ export default function HeatmapViewer() {
     if (info.layer?.id === 'custom-building-polygons') return;
     if (info.layer?.id === 'selected-cell-highlight') return;
     if (info.layer?.id === 'virtual-event-markers') return;
+    if (info.layer?.id === 'empty-space-highlight') return;
     if (!info.coordinate) {
       setSelectedCell(null);
       setSelectedPoi(null);
@@ -519,12 +519,19 @@ export default function HeatmapViewer() {
         best = c;
       }
     }
-    if (bestD < 0.00005 && best) {
+    const distanceDeg = Math.sqrt(bestD);
+    if (distanceDeg < 0.00015 && best) {
       setSelectedCell(best);
       setSelectedPoi(null);
     } else {
       setSelectedCell(null);
-      setSelectedPoi(null);
+      setSelectedPoi({
+        id: 'empty-space-click',
+        name: 'Bãi đất trống',
+        lat: lat,
+        lng: lng,
+        labelMinZoom: 0,
+      });
     }
   };
 
@@ -652,7 +659,36 @@ export default function HeatmapViewer() {
           mapStyle={computedMapStyle}
           mapLib={maplibregl}
           {...viewState}
-        />
+        >
+          {selectedPoi && selectedPoi.id === 'empty-space-click' && (
+            <Marker longitude={selectedPoi.lng} latitude={selectedPoi.lat} anchor="bottom">
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pointerEvents: 'none' }}>
+                <div style={{ 
+                  background: 'rgba(15,15,20,0.9)', 
+                  padding: '6px 10px', 
+                  borderRadius: 8, 
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                  fontSize: 12, 
+                  fontWeight: 600, 
+                  color: '#fafafa',
+                  whiteSpace: 'nowrap',
+                  textAlign: 'center',
+                  marginBottom: 4,
+                  backdropFilter: 'blur(8px)'
+                }}>
+                  Bãi đất trống<br/>
+                  <span style={{ fontSize: 10, color: '#a1a1aa', fontWeight: 400 }}>
+                    {selectedPoi.lat.toFixed(5)}, {selectedPoi.lng.toFixed(5)}
+                  </span>
+                </div>
+                <div style={{ fontSize: 28, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))', transform: 'translateY(4px)' }}>
+                  📍
+                </div>
+              </div>
+            </Marker>
+          )}
+        </ReactMap>
       </DeckGL>
 
       {/* ── Control / Simulation Panel ───────── */}
@@ -700,7 +736,7 @@ export default function HeatmapViewer() {
       )}
 
       {/* ── Building Detail Panel ───────────── */}
-      {selectedPoi && (
+      {selectedPoi && selectedPoi.id !== 'empty-space-click' && (
         <BuildingDetailPanel
           selectedPoi={selectedPoi}
           onClose={() => setSelectedPoi(null)}
