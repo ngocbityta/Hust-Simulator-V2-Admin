@@ -1,11 +1,12 @@
 import React from 'react';
+import { ChevronDown, Users } from 'lucide-react';
 
 interface PopulationSectionProps {
   multiplier: number;
-  onChange: (value: number) => void;
+  onChange: (val: number) => void;
   expanded: boolean;
   onToggle: () => void;
-  baseTotal?: number;
+  baseTotal?: number | null;
 }
 
 export default React.memo(function PopulationSection({
@@ -15,80 +16,52 @@ export default React.memo(function PopulationSection({
   onToggle,
   baseTotal,
 }: PopulationSectionProps) {
-  const estimatedTotal = baseTotal ? Math.round(baseTotal * multiplier) : null;
   const isModified = multiplier !== 1.0;
+  const estimatedTotal = baseTotal != null ? Math.round(baseTotal * multiplier) : null;
 
   return (
-    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="border-b border-white/5">
       <button
         onClick={onToggle}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 14px',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          color: '#e4e4e7',
-        }}
+        className="w-full flex items-center justify-between px-4 py-3.5 bg-transparent border-none cursor-pointer transition-colors duration-200 hover:bg-white/5 group"
       >
-        <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
+        <span className="flex items-center gap-2.5 text-[13px] font-bold text-zinc-200 group-hover:text-zinc-50">
           Mật độ người
           {isModified && (
-            <span style={{
-              fontSize: 10,
-              background: 'rgba(245,158,11,0.15)',
-              color: '#f59e0b',
-              padding: '2px 8px',
-              borderRadius: 10,
-              fontWeight: 700,
-            }}>
+            <span className="text-[10px] bg-amber-500/15 text-amber-500 px-2 py-0.5 rounded-full font-bold ml-1 border border-amber-500/20">
               x{multiplier.toFixed(1)}
             </span>
           )}
         </span>
-        <span style={{
-          fontSize: 12,
-          transition: 'transform 0.2s',
-          transform: expanded ? 'rotate(180deg)' : '',
-          color: '#71717a',
-        }}>▾</span>
+        <ChevronDown size={14} className={`text-zinc-500 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`} />
       </button>
 
-      <div style={{
-        maxHeight: expanded ? 200 : 0,
-        overflow: 'hidden',
-        transition: 'max-height 0.3s ease',
-      }}>
-        <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[250px]' : 'max-h-0'}`}>
+        <div className="px-4 pb-4 flex flex-col gap-4">
+          
           {/* Multiplier display */}
-          <div style={{
-            textAlign: 'center',
-            background: 'rgba(245,158,11,0.06)',
-            border: '1px solid rgba(245,158,11,0.15)',
-            borderRadius: 10,
-            padding: '12px 0',
-          }}>
-            <div style={{
-              fontSize: 28,
-              fontWeight: 800,
-              color: isModified ? '#f59e0b' : '#71717a',
-              fontFamily: 'monospace',
-              letterSpacing: '-0.02em',
-            }}>
-              {multiplier.toFixed(1)}x
-            </div>
-            {estimatedTotal !== null && (
-              <div style={{ fontSize: 11, color: '#a1a1aa', marginTop: 2 }}>
-                ≈ {estimatedTotal} người dự kiến
-              </div>
+          <div className="text-center bg-white/5 border border-white/10 rounded-2xl py-4 shadow-inner relative overflow-hidden">
+            {isModified && (
+              <div className="absolute inset-0 bg-amber-500/5" />
             )}
+            <div className="relative z-10">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Users size={14} className={isModified ? 'text-amber-500' : 'text-zinc-500'} />
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Hệ số mật độ</span>
+              </div>
+              <div className={`text-3xl font-extrabold font-mono tracking-tighter transition-colors duration-300 ${isModified ? 'text-amber-500 drop-shadow-[0_0_10px_rgba(245,158,11,0.3)]' : 'text-zinc-300'}`}>
+                {multiplier.toFixed(1)}x
+              </div>
+              {estimatedTotal !== null && (
+                <div className="text-[12px] font-medium text-zinc-400 mt-1">
+                  ≈ {estimatedTotal} người dự kiến
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Slider */}
-          <div>
+          <div className="px-1">
             <input
               type="range"
               min={0.1}
@@ -96,44 +69,29 @@ export default React.memo(function PopulationSection({
               step={0.1}
               value={multiplier}
               onChange={(e) => onChange(Number(e.target.value))}
-              style={{
-                width: '100%',
-                height: 6,
-                appearance: 'none',
-                background: `linear-gradient(90deg, #3f3f46 0%, #f59e0b 50%, #ef4444 100%)`,
-                borderRadius: 3,
-                outline: 'none',
-                cursor: 'pointer',
-              }}
+              className="w-full h-2 appearance-none rounded-full outline-none cursor-pointer bg-gradient-to-r from-zinc-700 via-amber-500 to-red-500 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-lg hover:[&::-webkit-slider-thumb]:scale-125 transition-all"
             />
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-              <span style={{ fontSize: 9, color: '#52525b' }}>0.1x</span>
+            <div className="flex justify-between mt-2 px-1">
+              <span className="text-[10px] font-bold text-zinc-600">0.1x</span>
               <span
-                style={{ fontSize: 9, color: '#71717a', cursor: 'pointer', textDecoration: 'underline' }}
+                className="text-[10px] font-bold text-zinc-400 cursor-pointer hover:text-amber-500 transition-colors border-b border-dashed border-zinc-600 hover:border-amber-500"
                 onClick={() => onChange(1.0)}
-              >1.0x (mặc định)</span>
-              <span style={{ fontSize: 9, color: '#52525b' }}>3.0x</span>
+              >1.0x (Mặc định)</span>
+              <span className="text-[10px] font-bold text-zinc-600">3.0x</span>
             </div>
           </div>
 
           {/* Quick presets */}
-          <div style={{ display: 'flex', gap: 6 }}>
+          <div className="flex gap-2">
             {[0.5, 1.0, 1.5, 2.0, 3.0].map((val) => (
               <button
                 key={val}
                 onClick={() => onChange(val)}
-                style={{
-                  flex: 1,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  padding: '6px 0',
-                  borderRadius: 6,
-                  border: `1px solid ${multiplier === val ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.08)'}`,
-                  background: multiplier === val ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.03)',
-                  color: multiplier === val ? '#f59e0b' : '#71717a',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                }}
+                className={`flex-1 text-[12px] font-bold py-2 rounded-xl border transition-all duration-200 ${
+                  multiplier === val 
+                    ? 'border-amber-500/50 bg-amber-500/15 text-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.1)]' 
+                    : 'border-white/10 bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-zinc-200'
+                }`}
               >{val}x</button>
             ))}
           </div>

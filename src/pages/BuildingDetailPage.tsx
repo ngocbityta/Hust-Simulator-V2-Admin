@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
 import { Building2, Search, Filter, AlertTriangle, ArrowLeft, Loader2, Box, Edit } from 'lucide-react';
-import { Pagination } from '../components/common/Pagination';
 import { FloorRoomsCarousel } from '../components/FloorRoomsCarousel';
 import { EditBuildingModal } from '../components/EditBuildingModal';
 

@@ -62,6 +62,20 @@ export function useSimulation() {
     setScenario((prev) => ({ ...prev, targetTime: value }));
   }, []);
 
+  const addCustomBuilding = useCallback((b: import('../types/heatmap').BuildingPolygonData) => {
+    setScenario((prev) => ({
+      ...prev,
+      customBuildings: [...prev.customBuildings, b],
+    }));
+  }, []);
+
+  const removeCustomBuilding = useCallback((id: string) => {
+    setScenario((prev) => ({
+      ...prev,
+      customBuildings: prev.customBuildings.filter((b) => b.id !== id),
+    }));
+  }, []);
+
   const runSimulation = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -124,6 +138,7 @@ export function useSimulation() {
     scenario.virtualEvents.length > 0 ||
     scenario.eventModifications.length > 0 ||
     scenario.closedFacilities.length > 0 ||
+    scenario.customBuildings.length > 0 ||
     scenario.userCountMultiplier !== 1.0;
 
   return {
@@ -139,6 +154,8 @@ export function useSimulation() {
     toggleFacilityClosed,
     setUserCountMultiplier,
     setTargetTime,
+    addCustomBuilding,
+    removeCustomBuilding,
     runSimulation,
     resetAll,
   };

@@ -7,6 +7,8 @@ import maplibregl from 'maplibre-gl';
 import { useHeatmapData } from '../hooks/useHeatmapData';
 import { useSimulation } from '../hooks/useSimulation';
 import { getQuickPicks } from '../utils/heatmapHelpers';
+import { generateCampusGrid, mergeSelectedCells, validateCustomBuilding } from '../utils/geoValidation';
+import type { GridCell } from '../utils/geoValidation';
 import { apiFetch } from '../utils/api';
 import type { ViewState, CellData, PoiData, BuildingPolygonData, WayData } from '../types/heatmap';
 import {
@@ -64,6 +66,68 @@ export default function HeatmapViewer() {
   const [cursor, setCursor] = useState<string>('crosshair');
   const [hoveredBuildingName, setHoveredBuildingName] = useState<string>('');
   const [rawMapStyle, setRawMapStyle] = useState<Record<string, unknown> | null>(null);
+
+  // Drawing mode state
+  const [isDrawingMode, setIsDrawingMode] = useState(false);
+  const [gridCells, setGridCells] = useState<GridCell[]>([]);
+  const [selectedGridCellIds, setSelectedGridCellIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (isDrawingMode && gridCells.length === 0) {
+      setGridCells(generateCampusGrid(5)); // 5 meters resolution
+    }
+  }, [isDrawingMode, gridCells.length]);
+
+  const handleFinishDrawing = useCallback(() => {
+    if (selectedGridCellIds.size === 0) {
+      alert("Vui lòng chọn ít nhất 1 ô lưới trên bản đồ.");
+      return;
+    }
+    const selectedPolygons = gridCells
+      .filter((c) => selectedGridCellIds.has(c.id))
+      .map((c) => c.polygon);
+    
+    const merged = mergeSelectedCells(selectedPolygons);
+    if (!merged) {
+      alert("Lỗi khi ghép các ô lưới.");
+      return;
+    }
+
+    const validation = validateCustomBuilding(merged, buildingPolygons, ways);
+    if (!validation.isValid) {
+      alert(validation.error);
+      return;
+    }
+
+    const buildingName = prompt("Nhập tên cho Tòa nhà / Khu vực ảo này:");
+    if (!buildingName) return;
+
+    // Convert GeoJSON Polygon coordinates to number[][]
+    // For Polygon, coordinates is number[][][], we take the first ring
+    let coords: number[][] = [];
+    if (merged.geometry.type === 'Polygon') {
+      coords = merged.geometry.coordinates[0] as number[][];
+    } else if (merged.geometry.type === 'MultiPolygon') {
+      coords = merged.geometry.coordinates[0][0] as number[][];
+    }
+
+    const newBuilding: BuildingPolygonData = {
+      id: `virtual-building-${Date.now()}`,
+      name: buildingName,
+      category: 'VIRTUAL',
+      fillColor: [56, 189, 248, 160],
+      coordinates: coords,
+    };
+
+    sim.addCustomBuilding(newBuilding);
+    setIsDrawingMode(false);
+    setSelectedGridCellIds(new Set());
+  }, [selectedGridCellIds, gridCells, buildingPolygons, ways, sim]);
+
+  const handleCancelDrawing = useCallback(() => {
+    setIsDrawingMode(false);
+    setSelectedGridCellIds(new Set());
+  }, []);
 
   const poisRef = useRef<PoiData[]>([]);
 
@@ -321,7 +385,7 @@ export default function HeatmapViewer() {
         // ─── 1. Custom Colored Buildings Overlay ───
         new PolygonLayer({
           id: 'custom-building-polygons',
-          data: buildingPolygons,
+          data: [...buildingPolygons, ...(mode === 'simulation' ? sim.scenario.customBuildings : [])],
           pickable: true,
           stroked: true,
           filled: true,
@@ -489,15 +553,46 @@ export default function HeatmapViewer() {
             getText: [mode, closedBuildingIds],
             getColor: [mode, closedBuildingIds],
           }
-        }),
+        })
+    ];
 
+      if (isDrawingMode) {
+        layersArray.push(
+          new PolygonLayer({
+            id: 'drawing-grid-layer',
+            data: gridCells,
+            pickable: true,
+            stroked: true,
+            filled: true,
+            getPolygon: (d: any) => d.polygon.geometry.coordinates as number[][][],
+            getFillColor: (d: any) => selectedGridCellIds.has(d.id) ? [245, 158, 11, 160] : [0, 0, 0, 0],
+            getLineColor: () => [255, 255, 255, 60],
+            getLineWidth: () => 1.5,
+          })
+        );
+      }
 
-
-      ].filter(Boolean);
-  }, [displayData, selectedCell, setSelectedCell, pois, ways, setSelectedPoi, buildingPolygons, hoveredBuildingName, viewState.zoom, campusPolygon, selectedPoi, mode, closedBuildingIds, sim.scenario.virtualEvents]);
+      return layersArray;
+  }, [displayData, selectedCell, setSelectedCell, pois, ways, setSelectedPoi, buildingPolygons, hoveredBuildingName, viewState.zoom, campusPolygon, selectedPoi, mode, closedBuildingIds, sim.scenario.virtualEvents, isDrawingMode, gridCells, selectedGridCellIds]);
 
   /* ── Map click → find nearest cell or building ── */
   const handleClick = (info: { layer?: { id: string }; coordinate?: number[]; object?: unknown }) => {
+    if (isDrawingMode && info.layer?.id === 'drawing-grid-layer') {
+      const cell = info.object as GridCell;
+      if (cell) {
+        setSelectedGridCellIds((prev) => {
+          const next = new Set(prev);
+          if (next.has(cell.id)) {
+            next.delete(cell.id);
+          } else {
+            next.add(cell.id);
+          }
+          return next;
+        });
+      }
+      return;
+    }
+
     if (info.layer?.id === 'building-labels') return;
     if (info.layer?.id === 'custom-building-polygons') return;
     if (info.layer?.id === 'selected-cell-highlight') return;
@@ -547,100 +642,13 @@ export default function HeatmapViewer() {
 
   return (
     <div className="relative w-full h-full overflow-hidden" style={{ background: '#0a0a0f' }}>
-      {/* ── Mode Toggle ─────────────────────── */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 16,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 20,
-          display: 'flex',
-          borderRadius: 12,
-          overflow: 'hidden',
-          border: `1px solid ${mode === 'simulation' ? 'rgba(245,158,11,0.3)' : 'rgba(255,255,255,0.1)'}`,
-          background: 'rgba(15,15,20,0.9)',
-          backdropFilter: 'blur(16px)',
-          boxShadow: mode === 'simulation'
-            ? '0 4px 20px rgba(245,158,11,0.15)'
-            : '0 4px 20px rgba(0,0,0,0.3)',
-          transition: 'all 0.3s',
-        }}
-      >
-        <button
-          onClick={() => handleModeChange('observation')}
-          style={{
-            padding: '8px 18px',
-            fontSize: 12,
-            fontWeight: 700,
-            border: 'none',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: mode === 'observation'
-              ? 'linear-gradient(135deg, rgba(167,139,250,0.25), rgba(56,189,248,0.15))'
-              : 'transparent',
-            color: mode === 'observation' ? '#c4b5fd' : '#52525b',
-          }}
-        >
-          🔭 Quan sát
-        </button>
-        <button
-          onClick={() => handleModeChange('simulation')}
-          style={{
-            padding: '8px 18px',
-            fontSize: 12,
-            fontWeight: 700,
-            border: 'none',
-            borderLeft: '1px solid rgba(255,255,255,0.06)',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            background: mode === 'simulation'
-              ? 'linear-gradient(135deg, rgba(245,158,11,0.25), rgba(217,119,6,0.15))'
-              : 'transparent',
-            color: mode === 'simulation' ? '#f59e0b' : '#52525b',
-          }}
-        >
-          🔬 Giả lập
-        </button>
-      </div>
-
+      
       {/* ── Simulation Mode Banner ─────────── */}
       {mode === 'simulation' && (
         <div
-          style={{
-            position: 'absolute',
-            bottom: 20,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 15,
-            background: 'rgba(245,158,11,0.12)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(245,158,11,0.25)',
-            borderRadius: 10,
-            padding: '6px 16px',
-            fontSize: 11,
-            fontWeight: 600,
-            color: '#f59e0b',
-            letterSpacing: '0.02em',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            pointerEvents: 'none',
-          }}
+          className="absolute bottom-5 left-1/2 -translate-x-1/2 z-15 bg-amber-500/10 backdrop-blur-md border border-amber-500/25 rounded-lg px-4 py-1.5 text-[11px] font-semibold text-amber-500 tracking-wide flex items-center gap-1.5 pointer-events-none"
         >
-          <span style={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            background: '#f59e0b',
-            animation: 'pulse 2s infinite',
-          }} />
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-[pulse_2s_infinite]" />
           SIMULATION MODE — Kết quả chỉ mang tính giả lập
         </div>
       )}
@@ -718,6 +726,7 @@ export default function HeatmapViewer() {
           onToggleFacility={sim.toggleFacilityClosed}
           onSetMultiplier={sim.setUserCountMultiplier}
           onSetTargetTime={sim.setTargetTime}
+          onRemoveCustomBuilding={sim.removeCustomBuilding}
           onRunSimulation={sim.runSimulation}
           onResetAll={sim.resetAll}
           onExitSimulation={() => handleModeChange('observation')}
@@ -746,62 +755,98 @@ export default function HeatmapViewer() {
         />
       )}
 
+      {/* Button to activate drawing mode in Simulation Panel */}
+      {!isDrawingMode && mode === 'simulation' && (
+        <div className={`absolute top-4 ${panelCollapsed ? 'right-4' : 'right-[400px]'} transition-all duration-300 z-10 pointer-events-auto`}>
+          <button
+            onClick={() => setIsDrawingMode(true)}
+            className="flex items-center gap-2 bg-[#1e1e24]/90 backdrop-blur-md border border-amber-500/30 text-amber-500 px-4 py-2 rounded-xl shadow-lg hover:bg-amber-500/10 transition-colors font-medium text-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/><path d="M3 3h18v18H3z"/></svg>
+            Vẽ tòa nhà ảo
+          </button>
+        </div>
+      )}
+
+      {/* Bottom Overlays */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-10 pointer-events-auto transition-transform duration-300">
+        {/* Drawing Toolbar */}
+        {isDrawingMode && (
+          <div className="flex items-center gap-3 bg-[#1e1e24]/90 backdrop-blur-xl border border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)] rounded-2xl p-2 px-4">
+            <span className="text-amber-500 font-medium mr-2 text-sm">
+              <span className="animate-pulse mr-2">●</span> Đang vẽ tòa nhà
+            </span>
+            <button
+              onClick={handleFinishDrawing}
+              className="bg-amber-500 hover:bg-amber-400 text-black px-4 py-1.5 rounded-xl font-medium text-sm transition-colors"
+            >
+              Hoàn tất
+            </button>
+            <button
+              onClick={handleCancelDrawing}
+              className="bg-white/10 hover:bg-white/20 text-white px-4 py-1.5 rounded-xl font-medium text-sm transition-colors"
+            >
+              Hủy
+            </button>
+          </div>
+        )}
+
+        {/* Mode Toggle */}
+        {!isDrawingMode && (
+          <div className="flex bg-[#1e1e24]/80 backdrop-blur-md rounded-2xl p-1 shadow-2xl border border-white/5 transition-all">
+            <button
+              onClick={() => handleModeChange('observation')}
+              className={`px-4 py-2 text-xs font-bold border-none cursor-pointer transition-all duration-200 flex items-center gap-1.5 ${
+                mode === 'observation'
+                  ? 'bg-gradient-to-br from-violet-400/25 to-sky-400/15 text-violet-300'
+                  : 'bg-transparent text-zinc-500'
+              }`}
+            >
+              🔭 Quan sát
+            </button>
+            <button
+              onClick={() => handleModeChange('simulation')}
+              className={`px-4 py-2 text-xs font-bold border-none border-l border-white/5 cursor-pointer transition-all duration-200 flex items-center gap-1.5 ${
+                mode === 'simulation'
+                  ? 'bg-gradient-to-br from-amber-500/25 to-amber-600/15 text-amber-500'
+                  : 'bg-transparent text-zinc-500'
+              }`}
+            >
+              🔬 Giả lập
+            </button>
+          </div>
+        )}
+      </div>
+
       {/* ── Dynamic AI model predicting overlay ── */}
       {loading && (
         <div
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            background: mode === 'simulation'
-              ? 'rgba(10,10,14,0.7)'
-              : 'rgba(10,10,14,0.7)',
-            backdropFilter: 'blur(20px)',
-            border: `1px solid ${mode === 'simulation' ? 'rgba(245,158,11,0.3)' : 'rgba(167,139,250,0.3)'}`,
-            borderRadius: 24,
-            padding: '32px 48px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 20,
-            zIndex: 99999,
-            pointerEvents: 'none',
-            boxShadow: mode === 'simulation'
-              ? '0 0 40px rgba(245,158,11,0.2), inset 0 0 20px rgba(245,158,11,0.1)'
-              : '0 0 40px rgba(139,92,246,0.2), inset 0 0 20px rgba(139,92,246,0.1)',
-          }}
+          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-zinc-950/70 backdrop-blur-xl border rounded-[24px] px-12 py-8 flex flex-col items-center gap-5 z-[99999] pointer-events-none ${
+            mode === 'simulation'
+              ? 'border-amber-500/30 shadow-[0_0_40px_rgba(245,158,11,0.2),_inset_0_0_20px_rgba(245,158,11,0.1)]'
+              : 'border-violet-400/30 shadow-[0_0_40px_rgba(139,92,246,0.2),_inset_0_0_20px_rgba(139,92,246,0.1)]'
+          }`}
         >
           <div className="relative w-16 h-16 flex items-center justify-center">
             <div
-              className="absolute inset-0 rounded-full border-[3px] border-transparent custom-spinner"
-              style={{
-                borderTopColor: mode === 'simulation' ? '#f59e0b' : '#a855f7',
-                borderLeftColor: mode === 'simulation' ? '#d97706' : '#9333ea',
-                opacity: 0.8,
-              }}
+              className={`absolute inset-0 rounded-full border-[3px] border-transparent custom-spinner opacity-80 ${
+                mode === 'simulation' ? 'border-t-amber-500 border-l-amber-600' : 'border-t-purple-500 border-l-purple-600'
+              }`}
             />
             <div
-              className="absolute inset-2 rounded-full animate-pulse"
-              style={{
-                background: mode === 'simulation' ? 'rgba(245,158,11,0.2)' : 'rgba(168,85,247,0.2)',
-                boxShadow: mode === 'simulation'
-                  ? '0 0 15px rgba(245,158,11,0.5)'
-                  : '0 0 15px rgba(168,85,247,0.5)',
-              }}
+              className={`absolute inset-2 rounded-full animate-pulse ${
+                mode === 'simulation'
+                  ? 'bg-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.5)]'
+                  : 'bg-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.5)]'
+              }`}
             />
             <span className="relative text-2xl">{mode === 'simulation' ? '🔬' : '🧠'}</span>
           </div>
           <div className="flex flex-col items-center">
             <div
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: mode === 'simulation' ? '#f59e0b' : '#a78bfa',
-                letterSpacing: '0.02em',
-                marginTop: 4,
-              }}
-              className="animate-pulse"
+              className={`text-[13px] font-medium tracking-wide mt-1 animate-pulse ${
+                mode === 'simulation' ? 'text-amber-500' : 'text-violet-400'
+              }`}
             >
               {mode === 'simulation'
                 ? 'Đang chạy kịch bản giả lập...'

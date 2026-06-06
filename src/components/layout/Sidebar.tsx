@@ -3,7 +3,6 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Map, 
   Building2, 
-  Box,
   Users, 
   CalendarRange, 
   CalendarDays, 
@@ -55,18 +54,20 @@ export const Sidebar: React.FC = () => {
       {/* Sidebar */}
       <aside className={`
         fixed md:sticky top-0 left-0 h-screen w-64 flex flex-col
-        bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-r border-zinc-200/80 dark:border-zinc-800/50 
-        transition-transform duration-300 ease-in-out z-40
+        bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-r border-zinc-200/50 dark:border-zinc-800/50 
+        transition-transform duration-300 ease-in-out z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
         {/* Logo Area */}
-        <div className="h-16 flex items-center px-6 border-b border-zinc-200/80 dark:border-zinc-800/50">
-          <Activity className="w-6 h-6 text-emerald-500 mr-3" />
-          <h1 className="text-zinc-900 dark:text-zinc-100 font-semibold tracking-wide">HustSim Admin</h1>
+        <div className="h-16 flex items-center px-6 border-b border-zinc-200/50 dark:border-zinc-800/50">
+          <div className="relative flex items-center justify-center w-8 h-8 mr-3 rounded-lg bg-emerald-500/10 text-emerald-500">
+            <Activity className="w-5 h-5 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+          </div>
+          <h1 className="text-zinc-900 dark:text-zinc-100 font-bold tracking-wide text-lg">HustSim <span className="text-emerald-500 font-light">Admin</span></h1>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1.5">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             // Highlight parent paths if exact match isn't suitable, but here we just use strict equality or startsWith for root.
@@ -80,52 +81,55 @@ export const Sidebar: React.FC = () => {
                 to={item.path}
                 onClick={() => setIsOpen(false)}
                 className={`
-                  flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
+                  relative flex items-center px-3 py-2.5 rounded-xl transition-all duration-300 group overflow-hidden
                   ${isActive 
-                    ? 'bg-emerald-500/10 text-emerald-400 font-medium' 
-                    : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100'
+                    ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold shadow-sm shadow-emerald-500/5' 
+                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-zinc-100'
                   }
                 `}
               >
+                {isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-emerald-500 rounded-r-full shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                )}
                 <Icon 
                   size={18} 
                   className={`
-                    mr-3 transition-colors duration-200
-                    ${isActive ? 'text-emerald-400' : 'text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-700 dark:hover:text-zinc-300'}
+                    mr-3 transition-colors duration-300
+                    ${isActive ? 'text-emerald-500 dark:text-emerald-400' : 'text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300'}
                   `} 
                 />
-                {item.label}
+                <span className="z-10">{item.label}</span>
               </NavLink>
             );
           })}
         </nav>
 
         {/* Footer Area */}
-        <div className="p-4 border-t border-zinc-200/80 dark:border-zinc-800/50 space-y-2">
+        <div className="p-4 border-t border-zinc-200/50 dark:border-zinc-800/50 space-y-2">
           <button
             onClick={toggleTheme}
-            className="flex items-center px-3 py-2 w-full rounded-lg text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-200"
+            className="flex items-center px-3 py-2 w-full rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-300 group"
           >
             {theme === 'dark' ? (
               <>
-                <Sun size={18} className="mr-3 text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-700 dark:hover:text-zinc-300" />
-                <span>Chế độ sáng</span>
+                <Sun size={18} className="mr-3 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
+                <span className="font-medium">Chế độ sáng</span>
               </>
             ) : (
               <>
-                <Moon size={18} className="mr-3 text-zinc-500 group-hover:text-zinc-700 dark:group-hover:text-zinc-700 dark:hover:text-zinc-300" />
-                <span>Chế độ tối</span>
+                <Moon size={18} className="mr-3 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors" />
+                <span className="font-medium">Chế độ tối</span>
               </>
             )}
           </button>
 
-          <div className="flex items-center px-3 py-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
+          <div className="flex items-center px-3 py-3 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-emerald-500/20">
               A
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Admin</p>
-              <p className="text-xs text-zinc-500">Superuser</p>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight">Admin User</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-0.5">Superuser</p>
             </div>
           </div>
         </div>

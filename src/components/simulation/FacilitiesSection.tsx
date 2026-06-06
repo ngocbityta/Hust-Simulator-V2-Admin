@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import type { ClosedFacility } from '../../types/simulation';
 import { apiFetch } from '../../utils/api';
+import { ChevronDown, Building2, ParkingCircle, DoorOpen, Search, Lock, CheckCircle2 } from 'lucide-react';
 
 interface FacilitiesSectionProps {
   closedFacilities: ClosedFacility[];
@@ -66,52 +67,26 @@ export default React.memo(function FacilitiesSection({
   const closedCount = closedFacilities.length;
 
   return (
-    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="border-b border-white/5">
       <button
         onClick={onToggleSection}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 14px',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          color: '#e4e4e7',
-        }}
+        className="w-full flex items-center justify-between px-4 py-3.5 bg-transparent border-none cursor-pointer transition-colors duration-200 hover:bg-white/5 group"
       >
-        <span style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600 }}>
+        <span className="flex items-center gap-2.5 text-[13px] font-bold text-zinc-200 group-hover:text-zinc-50">
           Cơ sở vật chất
           {closedCount > 0 && (
-            <span style={{
-              fontSize: 10,
-              background: 'rgba(239,68,68,0.15)',
-              color: '#f87171',
-              padding: '2px 8px',
-              borderRadius: 10,
-              fontWeight: 700,
-            }}>
+            <span className="text-[10px] bg-red-500/15 text-red-400 px-2 py-0.5 rounded-full font-bold ml-1 border border-red-500/20">
               {closedCount} đóng
             </span>
           )}
         </span>
-        <span style={{
-          fontSize: 12,
-          transition: 'transform 0.2s',
-          transform: expanded ? 'rotate(180deg)' : '',
-          color: '#71717a',
-        }}>▾</span>
+        <ChevronDown size={14} className={`text-zinc-500 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`} />
       </button>
 
-      <div style={{
-        maxHeight: expanded ? 400 : 0,
-        overflow: 'hidden',
-        transition: 'max-height 0.3s ease',
-      }}>
-        <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expanded ? 'max-h-[450px]' : 'max-h-0'}`}>
+        <div className="px-4 pb-4 flex flex-col gap-3.5">
           {/* Tab switcher */}
-          <div style={{ display: 'flex', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="flex rounded-xl overflow-hidden border border-white/10 p-1 bg-black/40">
             {[
               { key: 'building' as const, label: 'Tòa nhà' },
               { key: 'node' as const, label: 'Cổng & Nhà xe' },
@@ -119,102 +94,70 @@ export default React.memo(function FacilitiesSection({
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                style={{
-                  flex: 1,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  padding: '7px 0',
-                  border: 'none',
-                  background: tab === t.key ? 'rgba(245,158,11,0.15)' : 'transparent',
-                  color: tab === t.key ? '#f59e0b' : '#71717a',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                }}
+                className={`flex-1 text-[12px] font-bold py-1.5 border-none transition-all duration-200 rounded-lg ${
+                  tab === t.key 
+                    ? 'bg-amber-500/15 text-amber-500 shadow-sm' 
+                    : 'bg-transparent text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
+                }`}
               >{t.label}</button>
             ))}
           </div>
 
           {/* Search */}
-          <div style={{ position: 'relative' }}>
-            <span style={{
-              position: 'absolute',
-              left: 10,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              fontSize: 12,
-              color: '#52525b',
-              pointerEvents: 'none',
-            }}>🔍</span>
+          <div className="relative group">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 pointer-events-none group-focus-within:text-amber-500 transition-colors">
+              <Search size={14} />
+            </span>
             <input
               type="text"
               placeholder="Tìm kiếm..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              style={{
-                width: '100%',
-                background: 'rgba(0,0,0,0.3)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 8,
-                padding: '7px 10px 7px 30px',
-                fontSize: 12,
-                color: '#e4e4e7',
-                outline: 'none',
-              }}
+              className="w-full bg-black/40 border border-white/10 rounded-xl py-2 pr-3 pl-9 text-[12px] font-medium text-zinc-200 outline-none transition-all duration-200 focus:border-amber-500/50 focus:bg-black/60 focus:shadow-[0_0_10px_rgba(245,158,11,0.1)]"
             />
           </div>
 
           {/* Facility List */}
           <div
-            style={{ maxHeight: 220, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 4 }}
-            className="custom-scrollbar"
+            className="max-h-[240px] overflow-y-auto flex flex-col gap-1.5 custom-scrollbar pr-1"
           >
             {filtered.map((f) => {
               const isClosed = closedIds.has(f.id);
+              const Icon = f.type === 'gate' ? DoorOpen : f.type === 'parking' ? ParkingCircle : Building2;
+              
               return (
                 <button
                   key={f.id}
                   onClick={() => onToggle({ id: f.id, name: f.name, type: f.type })}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '8px 10px',
-                    borderRadius: 8,
-                    border: `1px solid ${isClosed ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.05)'}`,
-                    background: isClosed ? 'rgba(239,68,68,0.06)' : 'rgba(255,255,255,0.02)',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                    width: '100%',
-                    textAlign: 'left',
-                  }}
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-xl border cursor-pointer transition-all duration-200 w-full text-left group ${
+                    isClosed 
+                      ? 'border-red-500/30 bg-red-500/10 hover:bg-red-500/20' 
+                      : 'border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10'
+                  }`}
                 >
-                  <span style={{
-                    fontSize: 12,
-                    color: isClosed ? '#f87171' : '#d4d4d8',
-                    fontWeight: 500,
-                    textDecoration: isClosed ? 'line-through' : 'none',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: 220,
-                  }}>
-                    {f.type === 'gate' ? '🚪 ' : f.type === 'parking' ? '🅿️ ' : ''}{f.name}
-                  </span>
-                  <span style={{
-                    fontSize: 16,
-                    flexShrink: 0,
-                    width: 28,
-                    textAlign: 'center',
-                    transition: 'transform 0.2s',
-                  }}>
-                    {isClosed ? '🔒' : '✅'}
-                  </span>
+                  <div className={`flex items-center gap-2 overflow-hidden ${
+                    isClosed ? 'text-red-400 opacity-80' : 'text-zinc-300'
+                  }`}>
+                    <Icon size={14} className={isClosed ? 'text-red-400' : 'text-zinc-500 group-hover:text-zinc-300'} />
+                    <span className={`text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap ${
+                      isClosed ? 'line-through' : ''
+                    }`}>
+                      {f.name}
+                    </span>
+                  </div>
+                  <div className="shrink-0 flex items-center justify-center w-6 ml-2">
+                    {isClosed ? (
+                      <Lock size={14} className="text-red-500" />
+                    ) : (
+                      <CheckCircle2 size={14} className="text-emerald-500/50 group-hover:text-emerald-500 transition-colors" />
+                    )}
+                  </div>
                 </button>
               );
             })}
             {filtered.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '16px 0', color: '#52525b', fontSize: 11 }}>
-                Không tìm thấy
+              <div className="text-center py-6 text-zinc-500 text-[12px] font-medium bg-white/5 rounded-xl border border-white/5 border-dashed">
+                Không tìm thấy kết quả
               </div>
             )}
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useFetch } from '../hooks/useFetch';
 import { AlertTriangle, CheckCircle2, Clock, Filter, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -25,8 +25,8 @@ export const IssuesPage: React.FC = () => {
   
   const [page, setPage] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string>('');
-  const [buildingFilter, setBuildingFilter] = useState<string>(initialBuildingId);
-  const [roomFilter, setRoomFilter] = useState<string>(initialRoomId);
+  const buildingFilter = initialBuildingId;
+  const roomFilter = initialRoomId;
 
   const { data, loading, error, refetch } = useFetch<any>(
     `/issues/paged?page=${page}&size=10&sort=createdAt,desc${statusFilter ? `&status=${statusFilter}` : ''}${buildingFilter ? `&buildingId=${buildingFilter}` : ''}${roomFilter ? `&roomId=${roomFilter}` : ''}`

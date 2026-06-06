@@ -1,5 +1,6 @@
 import React from 'react';
 import type { CellData } from '../types/heatmap';
+import { X } from 'lucide-react';
 
 interface ZoneDetailPanelProps {
   selectedCell: CellData;
@@ -8,70 +9,25 @@ interface ZoneDetailPanelProps {
 
 export default React.memo(function ZoneDetailPanel({ selectedCell, onClose }: ZoneDetailPanelProps) {
   return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        zIndex: 10,
-        width: 320,
-        maxHeight: 400,
-        background: 'rgba(15,15,20,0.92)',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 14,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-      }}
-    >
+    <div className="absolute bottom-5 right-5 z-10 w-80 max-h-[400px] bg-zinc-950/90 backdrop-blur-xl border border-white/10 rounded-2xl flex flex-col overflow-hidden shadow-2xl">
       {/* Header */}
-      <div
-        style={{
-          padding: '14px 16px 10px',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-        }}
-      >
+      <div className="px-4 pt-3.5 pb-2.5 border-b border-white/10 flex justify-between items-start">
         <div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#fafafa' }}>Zone Detail</div>
-          <div style={{ fontSize: 11, color: '#a1a1aa', marginTop: 2 }}>
-            Expected: <span style={{ color: '#38bdf8', fontWeight: 700 }}>{selectedCell.count.toFixed(1)}</span> people
+          <div className="text-sm font-bold text-zinc-50">Zone Detail</div>
+          <div className="text-[11px] text-zinc-400 mt-0.5">
+            Expected: <span className="text-sky-400 font-bold">{selectedCell.count.toFixed(1)}</span> people
           </div>
         </div>
         <button
           onClick={onClose}
-          style={{
-            width: 26,
-            height: 26,
-            borderRadius: 8,
-            background: 'rgba(255,255,255,0.06)',
-            border: 'none',
-            color: '#71717a',
-            cursor: 'pointer',
-            fontSize: 14,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all .15s',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
-            e.currentTarget.style.color = '#fafafa';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-            e.currentTarget.style.color = '#71717a';
-          }}
+          className="w-7 h-7 rounded-lg bg-white/5 border-none text-zinc-400 flex items-center justify-center transition-all duration-200 hover:bg-white/10 hover:text-zinc-50"
         >
-          ✕
+          <X size={16} />
         </button>
       </div>
 
       {/* Building list */}
-      <div style={{ padding: '8px 12px 14px', overflowY: 'auto', flex: 1 }} className="custom-scrollbar">
+      <div className="px-3 pt-2 pb-3.5 overflow-y-auto flex-1 custom-scrollbar">
         {Object.entries(selectedCell.intents)
           .sort(([, a], [, b]) => b - a)
           .map(([poi, count]) => {
@@ -79,60 +35,32 @@ export default React.memo(function ZoneDetailPanel({ selectedCell, onClose }: Zo
             return (
               <div
                 key={poi}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '7px 8px',
-                  marginBottom: 4,
-                  borderRadius: 8,
-                  background: 'rgba(255,255,255,0.03)',
-                  transition: 'background .15s',
-                  cursor: 'default',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                }}
+                className="flex items-center gap-2 px-2 py-1.5 mb-1 rounded-lg bg-white/5 transition-colors duration-200 hover:bg-white/10 cursor-default group"
               >
                 {/* Mini bar */}
                 <div
-                  style={{
-                    width: 4,
-                    height: 22,
-                    borderRadius: 2,
-                    background: `hsl(${160 - pct * 1.4}, 70%, 55%)`,
-                    flexShrink: 0,
-                  }}
+                  className="w-1 h-5 rounded-sm shrink-0 transition-colors duration-200"
+                  style={{ background: `hsl(${160 - pct * 1.4}, 70%, 55%)` }}
                 />
-                <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="flex-1 min-w-0">
                   <div
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: '#d4d4d8',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
+                    className="text-xs font-medium text-zinc-300 whitespace-nowrap overflow-hidden text-ellipsis group-hover:text-zinc-100 transition-colors"
                     title={poi}
                   >
                     {poi}
                   </div>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#fafafa', flexShrink: 0 }}>
+                <div className="text-xs font-bold text-zinc-50 shrink-0">
                   {count.toFixed(1)}
                 </div>
-                <div style={{ fontSize: 10, color: '#71717a', width: 36, textAlign: 'right', flexShrink: 0 }}>
+                <div className="text-[10px] text-zinc-500 w-9 text-right shrink-0 group-hover:text-zinc-400 transition-colors">
                   {pct.toFixed(0)}%
                 </div>
               </div>
             );
           })}
         {Object.keys(selectedCell.intents).length === 0 && (
-          <div style={{ textAlign: 'center', padding: '24px 0', color: '#3f3f46', fontSize: 12 }}>
+          <div className="text-center py-6 text-zinc-600 text-xs">
             No predicted destinations in this zone
           </div>
         )}

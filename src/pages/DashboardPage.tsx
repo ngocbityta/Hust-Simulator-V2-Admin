@@ -63,8 +63,8 @@ export const DashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Heatmap Density Timeline */}
-        <div className="bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xl">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-6">Mật độ bản đồ</h2>
+        <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl p-6 shadow-sm backdrop-blur-xl hover:shadow-md transition-shadow duration-300">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2"><span className="w-2 h-6 rounded-full bg-emerald-500"></span>Mật độ bản đồ</h2>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={heatmapData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -88,8 +88,8 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* User Activity Distribution */}
-        <div className="bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xl">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-6">Hành vi sinh viên</h2>
+        <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl p-6 shadow-sm backdrop-blur-xl hover:shadow-md transition-shadow duration-300">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2"><span className="w-2 h-6 rounded-full bg-blue-500"></span>Hành vi sinh viên</h2>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -120,18 +120,18 @@ export const DashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Top 5 Busiest Nodes */}
-        <div className="bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xl lg:col-span-1">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-6">Top 5 Nút giao Đông nhất</h2>
+        <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl p-6 shadow-sm backdrop-blur-xl hover:shadow-md transition-shadow duration-300 lg:col-span-1">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2"><span className="w-2 h-6 rounded-full bg-amber-500"></span>Top 5 Nút giao Đông nhất</h2>
           <div className="space-y-4">
             {topNodesData.map((item: any, index: number) => (
-              <div key={index} className="flex items-center justify-between p-3 rounded-xl bg-white/50 dark:bg-zinc-950/50 border border-zinc-200/80 dark:border-zinc-800/50">
+              <div key={index} className="flex items-center justify-between p-3.5 rounded-2xl bg-white/60 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800/80 transition-colors shadow-sm">
                 <div>
-                  <h3 className="text-zinc-800 dark:text-zinc-200 font-medium text-sm">{item.name}</h3>
-                  <span className="text-xs text-zinc-500 mt-1 block">Khung giờ: {item.time}</span>
+                  <h3 className="text-zinc-800 dark:text-zinc-200 font-semibold text-sm">{item.name}</h3>
+                  <span className="text-xs text-zinc-500 mt-1 block font-medium">Khung giờ: {item.time}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-emerald-400 font-bold">{item.estimate}</span>
-                  <span className="text-xs text-zinc-500 block">người</span>
+                  <span className="text-emerald-500 dark:text-emerald-400 font-bold text-lg">{item.estimate}</span>
+                  <span className="text-[10px] text-zinc-500 block uppercase tracking-wider font-semibold">người</span>
                 </div>
               </div>
             ))}
@@ -139,8 +139,8 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Room Occupancy By Building */}
-        <div className="bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xl lg:col-span-2">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-6">Công suất Phòng học theo Giảng đường</h2>
+        <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl p-6 shadow-sm backdrop-blur-xl hover:shadow-md transition-shadow duration-300 lg:col-span-2">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2"><span className="w-2 h-6 rounded-full bg-rose-500"></span>Công suất Phòng học</h2>
           <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={roomOccupancyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -162,20 +162,23 @@ export const DashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-1 gap-6">
         {/* Upcoming Timeline */}
-        <div className="bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-xl">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-white mb-6">Sắp tới & Đang diễn ra</h2>
+        <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl p-6 shadow-sm backdrop-blur-xl hover:shadow-md transition-shadow duration-300">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2"><span className="w-2 h-6 rounded-full bg-violet-500"></span>Sắp tới & Đang diễn ra</h2>
           <div className="space-y-4">
             {(d.eventsTimeline || []).slice(0, 5).map((event: any) => (
-              <div key={event.id} className="relative pl-6 pb-4 border-l border-zinc-200 dark:border-zinc-800 last:border-0 last:pb-0">
-                <div className={`absolute left-[-5px] top-1.5 w-2.5 h-2.5 rounded-full ${event.status === 'ONGOING' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-blue-500'}`} />
-                <div className="bg-white/50 dark:bg-zinc-950/50 border border-zinc-200/80 dark:border-zinc-800/50 rounded-xl p-3">
-                  <div className="flex justify-between items-start mb-1">
-                    <h3 className="text-zinc-800 dark:text-zinc-200 font-medium">{event.name}</h3>
-                    <span className="text-xs text-zinc-500">{event.startTime}</span>
+              <div key={event.id} className="relative pl-6 pb-4 border-l-2 border-zinc-200 dark:border-zinc-800 last:border-0 last:pb-0">
+                <div className={`absolute left-[-7px] top-1.5 w-3 h-3 rounded-full border-2 border-white dark:border-zinc-950 ${event.status === 'ONGOING' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]' : 'bg-blue-500'}`} />
+                <div className="bg-white/60 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl p-4 shadow-sm hover:shadow-md hover:border-emerald-500/30 transition-all duration-300 group cursor-default">
+                  <div className="flex justify-between items-start mb-1.5">
+                    <h3 className="text-zinc-900 dark:text-zinc-100 font-semibold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{event.name}</h3>
+                    <span className="text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded-full">{event.startTime}</span>
                   </div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-3">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 flex items-center gap-4 font-medium">
                     <span>Đến: {event.endTime}</span>
-                    <span className="flex items-center gap-1">{event.estimatedParticipants} dự kiến</span>
+                    <span className="flex items-center gap-1.5 text-zinc-600 dark:text-zinc-300 bg-zinc-100/50 dark:bg-zinc-800/50 px-2 py-0.5 rounded-md">
+                      <span className="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
+                      {event.estimatedParticipants} dự kiến
+                    </span>
                   </p>
                 </div>
               </div>
@@ -191,9 +194,10 @@ export const DashboardPage: React.FC = () => {
 };
 
 const StatCard = ({ title, value }: { title: string, value: string | number }) => (
-  <div className="bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-lg flex flex-col justify-center items-center text-center transition-all hover:bg-zinc-100/80 dark:hover:bg-zinc-800/50 cursor-default">
-    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium uppercase tracking-wider mb-2">{title}</p>
-    <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-zinc-800 to-zinc-500 dark:from-zinc-100 dark:to-zinc-400">{value}</h3>
+  <div className="bg-white/40 dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl p-6 shadow-sm flex flex-col justify-center items-center text-center transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:bg-white/80 dark:hover:bg-zinc-800/80 cursor-default backdrop-blur-md group relative overflow-hidden">
+    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+    <p className="text-zinc-500 dark:text-zinc-400 text-[12px] font-bold uppercase tracking-wider mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors relative z-10">{title}</p>
+    <h3 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-zinc-800 to-zinc-500 dark:from-white dark:to-zinc-400 drop-shadow-sm relative z-10">{value}</h3>
   </div>
 );
 

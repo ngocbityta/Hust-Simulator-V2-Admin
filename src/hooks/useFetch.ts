@@ -8,6 +8,7 @@ export function useFetch<T>(endpoint: string) {
 
   useEffect(() => {
     let isMounted = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
 
     apiFetch(endpoint)
