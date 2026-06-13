@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useFetch } from '../hooks/useFetch';
-import { apiFetch } from '../utils/api';
 import { ArrowLeft, Loader2, MapPin, Navigation, Calendar } from 'lucide-react';
 import DeckGL from '@deck.gl/react';
 import { ScatterplotLayer, PathLayer } from '@deck.gl/layers';
@@ -252,7 +251,7 @@ export const UserDetailPage: React.FC = () => {
         <div className="flex-1 relative">
           <DeckGL
             viewState={viewState}
-            onViewStateChange={({ viewState }) => setViewState(viewState as ViewState)}
+            onViewStateChange={({ viewState }) => setViewState(viewState as unknown as ViewState)}
             controller={true}
             layers={layers}
           >
