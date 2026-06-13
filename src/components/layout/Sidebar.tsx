@@ -18,12 +18,12 @@ import { useTheme } from '../../contexts/ThemeContext';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', path: '/', icon: BarChart3 },
-  { label: 'Heatmap', path: '/heatmap', icon: Map },
-  { label: 'Buildings', path: '/buildings', icon: Building2 },
-  { label: 'Users', path: '/users', icon: Users },
-  { label: 'Events', path: '/events', icon: CalendarDays },
-  { label: 'Recurring Events', path: '/recurring-events', icon: CalendarRange },
-  { label: 'Issues', path: '/issues', icon: AlertTriangle },
+  { label: 'Bản đồ mật độ', path: '/heatmap', icon: Map },
+  { label: 'Quản lý Tòa nhà', path: '/buildings', icon: Building2 },
+  { label: 'Quản lý Người dùng', path: '/users', icon: Users },
+  { label: 'Quản lý Sự kiện', path: '/events', icon: CalendarDays },
+  { label: 'Quản lý Lớp học ảo', path: '/recurring-events', icon: CalendarRange },
+  { label: 'Quản lý Sự cố', path: '/issues', icon: AlertTriangle },
 ];
 
 export const Sidebar: React.FC = () => {

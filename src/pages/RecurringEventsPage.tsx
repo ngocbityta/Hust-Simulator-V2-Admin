@@ -31,13 +31,13 @@ export const RecurringEventsPage: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
             <Repeat className="text-purple-500" size={32} />
-            Recurring Events
+            Quản lý Lớp học ảo
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Manage simulated recurring events</p>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Quản lý các sự kiện lặp lại và lớp học mô phỏng</p>
         </div>
         <button className="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-purple-500/20">
           <Plus size={20} />
-          Add Event
+          Thêm Lớp học
         </button>
       </div>
 
@@ -47,7 +47,7 @@ export const RecurringEventsPage: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
             <input 
               type="text"
-              placeholder="Search recurring events..."
+              placeholder="Tìm kiếm lớp học..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-500 transition-all"
@@ -58,19 +58,19 @@ export const RecurringEventsPage: React.FC = () => {
         {isLoading ? (
           <div className="flex justify-center items-center py-20 text-zinc-500">
             <Loader2 className="animate-spin mr-3" size={24} />
-            Loading events...
+            Đang tải danh sách lớp học...
           </div>
         ) : error ? (
           <div className="text-red-400 py-10 text-center bg-red-400/10 rounded-xl">
-            Failed to load events. Please try again.
+            Lỗi khi tải danh sách. Vui lòng thử lại.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
-                  <th className="pb-4 font-medium px-4">Name</th>
-                  <th className="pb-4 font-medium px-4 text-right">Actions</th>
+                  <th className="pb-4 font-medium px-4">Tên lớp học</th>
+                  <th className="pb-4 font-medium px-4 text-right">Hành động</th>
                 </tr>
               </thead>
               <tbody>
@@ -81,7 +81,7 @@ export const RecurringEventsPage: React.FC = () => {
                     </td>
                     <td className="py-4 px-4 text-right">
                       <button className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-purple-400 px-3 py-1.5 rounded-lg hover:bg-purple-400/10 transition-colors">
-                        Edit
+                        Sửa
                       </button>
                     </td>
                   </tr>
@@ -89,7 +89,7 @@ export const RecurringEventsPage: React.FC = () => {
                 {events.length === 0 && (
                   <tr>
                     <td colSpan={2} className="py-10 text-center text-zinc-500">
-                      No events found matching your search.
+                      Không tìm thấy lớp học nào phù hợp.
                     </td>
                   </tr>
                 )}

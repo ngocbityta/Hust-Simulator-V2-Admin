@@ -9,7 +9,7 @@ export const BuildingsPage: React.FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
   const [sortBy, setSortBy] = useState('roomCount,desc');
-  const size = 10;
+  const size = 12;
 
   // Debounce search input
   useEffect(() => {
@@ -37,13 +37,13 @@ export const BuildingsPage: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
             <Building2 className="text-emerald-500" size={32} />
-            Buildings
+            Quản lý Tòa nhà
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Manage simulated buildings and locations</p>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Quản lý các tòa nhà và địa điểm mô phỏng</p>
         </div>
         <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-emerald-500/20">
           <Plus size={20} />
-          Add Building
+          Thêm Tòa nhà
         </button>
       </div>
 
@@ -53,7 +53,7 @@ export const BuildingsPage: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
             <input 
               type="text"
-              placeholder="Search buildings..."
+              placeholder="Tìm kiếm tòa nhà..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-500 transition-all"
@@ -80,11 +80,11 @@ export const BuildingsPage: React.FC = () => {
         {isLoading ? (
           <div className="flex justify-center items-center py-20 text-zinc-500">
             <Loader2 className="animate-spin mr-3" size={24} />
-            Loading buildings...
+            Đang tải danh sách tòa nhà...
           </div>
         ) : error ? (
           <div className="text-red-400 py-10 text-center bg-red-400/10 rounded-xl">
-            Failed to load buildings. Please try again.
+            Lỗi khi tải danh sách. Vui lòng thử lại.
           </div>
         ) : (
           <div className="flex flex-col">

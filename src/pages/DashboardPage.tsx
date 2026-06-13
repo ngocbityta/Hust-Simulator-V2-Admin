@@ -41,7 +41,7 @@ export const DashboardPage: React.FC = () => {
         <select 
           value={timeRange} 
           onChange={(e) => setTimeRange(e.target.value)}
-          className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5 outline-none cursor-pointer"
+          className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-white text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5 outline-none cursor-pointer"
         >
           <option value="1d">24 Giờ Qua</option>
           <option value="1w">1 Tuần Qua</option>
@@ -52,10 +52,8 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-        <StatCard title="Tổng số người dùng" value={u.totalUsers || 0} />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard title="Đang Online" value={u.onlineUsers || 0} />
-        <StatCard title="Số Tòa nhà" value={d.totalBuildings || 0} />
         <StatCard title="Phòng đang bận" value={`${d.roomsBusy || 0} / ${d.totalRooms || 0}`} />
         <StatCard title="Sự kiện hoạt động" value={d.eventsOngoing || 0} />
         <StatCard title="Lớp học hoạt động" value={d.recurringEventsOngoing || 0} />

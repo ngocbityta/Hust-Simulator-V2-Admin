@@ -8,6 +8,7 @@ import { BuildingDetailPage } from './pages/BuildingDetailPage';
 import { RoomsPage } from './pages/RoomsPage';
 import { RoomDetailPage } from './pages/RoomDetailPage';
 import { UsersPage } from './pages/UsersPage';
+import { UserDetailPage } from './pages/UserDetailPage';
 import { EventsPage } from './pages/EventsPage';
 import { RecurringEventsPage } from './pages/RecurringEventsPage';
 import { IssuesPage } from './pages/IssuesPage';
@@ -33,6 +34,7 @@ function App() {
                 <Route path="/rooms" element={<RoomsPage />} />
                 <Route path="/rooms/:id" element={<RoomDetailPage />} />
                 <Route path="/users" element={<UsersPage />} />
+                <Route path="/users/:id" element={<UserDetailPage />} />
                 <Route path="/events" element={<EventsPage />} />
                 <Route path="/recurring-events" element={<RecurringEventsPage />} />
                 <Route path="/issues" element={<IssuesPage />} />

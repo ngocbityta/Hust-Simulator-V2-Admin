@@ -24,9 +24,8 @@ interface SimulationPanelProps {
   onRunSimulation: () => void;
   onResetAll: () => void;
   onExitSimulation: () => void;
-  quickPicks: QuickPickItem[];
   panelCollapsed: boolean;
-  setPanelCollapsed: (v: boolean) => void;
+  setPanelCollapsed: (collapsed: boolean) => void;
 }
 
 export default React.memo(function SimulationPanel({
@@ -46,7 +45,6 @@ export default React.memo(function SimulationPanel({
   onRunSimulation,
   onResetAll,
   onExitSimulation,
-  quickPicks,
   panelCollapsed,
   setPanelCollapsed,
 }: SimulationPanelProps) {
@@ -78,7 +76,7 @@ export default React.memo(function SimulationPanel({
       {/* Header */}
       <button
         onClick={() => setPanelCollapsed(!panelCollapsed)}
-        className={`bg-zinc-950/80 backdrop-blur-2xl border border-amber-500/20 px-4 py-3 cursor-pointer flex items-center justify-between gap-3 transition-all duration-300 shadow-[0_0_30px_rgba(245,158,11,0.06)] hover:bg-zinc-900/90 ${panelCollapsed ? 'rounded-2xl' : 'rounded-t-2xl'}`}
+        className={`bg-zinc-950/80 backdrop-blur-2xl border border-amber-500/20 px-5 py-3.5 cursor-pointer flex items-center justify-between gap-3 transition-all duration-300 shadow-2xl hover:bg-zinc-900/90 ${panelCollapsed ? 'rounded-2xl' : 'rounded-t-2xl'}`}
       >
         {!panelCollapsed ? (
           <div className="flex items-center gap-2.5">
@@ -101,7 +99,7 @@ export default React.memo(function SimulationPanel({
       </button>
 
       {!panelCollapsed && (
-        <div className="bg-zinc-950/80 backdrop-blur-2xl border border-amber-500/15 border-t-0 rounded-b-2xl max-h-[calc(100vh-120px)] overflow-y-auto flex flex-col shadow-[0_12px_40px_rgba(0,0,0,0.6),_0_0_20px_rgba(245,158,11,0.04)] custom-scrollbar">
+        <div className="bg-zinc-950/80 backdrop-blur-2xl border border-amber-500/15 border-t-0 rounded-b-2xl max-h-[calc(100vh-120px)] overflow-y-auto flex flex-col shadow-[0_12px_40px_rgba(0,0,0,0.6)] custom-scrollbar">
           
           {/* Header Action */}
           <div className="px-4 pt-3 pb-2 flex justify-between items-center border-b border-white/5">
@@ -122,27 +120,23 @@ export default React.memo(function SimulationPanel({
               <Clock size={12} className="text-zinc-400" />
               <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider">Thời điểm giả lập</span>
             </div>
-            <div className="relative mb-3 group">
-              <input
-                type="datetime-local"
-                value={scenario.targetTime}
-                onChange={(e) => onSetTargetTime(e.target.value)}
-                className="w-full bg-black/40 text-zinc-100 border border-white/10 rounded-xl px-3.5 py-2.5 text-[13px] font-medium outline-none font-sans cursor-pointer transition-all duration-200 focus:bg-black/60 focus:border-amber-500/60 focus:shadow-[0_0_15px_rgba(245,158,11,0.15)] group-hover:border-white/20"
-                style={{ colorScheme: 'dark' }}
-              />
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {quickPicks.slice(0, 6).map((qp) => (
-                <button
-                  key={qp.label}
-                  onClick={() => onSetTargetTime(qp.value)}
-                  className={`text-[11px] font-semibold py-1.5 px-2.5 rounded-lg border cursor-pointer transition-all duration-200 ${
-                    scenario.targetTime === qp.value
-                      ? 'text-amber-500 bg-amber-500/15 border-amber-500/40 shadow-[0_0_10px_rgba(245,158,11,0.1)]'
-                      : 'text-zinc-400 bg-white/5 border-white/5 hover:bg-white/10 hover:text-zinc-200 hover:border-white/10'
-                  }`}
-                >{qp.label}</button>
-              ))}
+            {/* Custom styled time input wrapper */}
+            <div className="relative group mb-1">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-orange-500/10 rounded-xl blur-md transition-opacity duration-300 opacity-100 group-hover:opacity-70"></div>
+              <div className="relative flex items-center bg-zinc-950/80 border border-white/10 rounded-xl p-1 overflow-hidden transition-all duration-300 group-hover:border-amber-500/50 shadow-inner">
+                <div className="flex-1 px-3 py-2">
+                  <input
+                    type="datetime-local"
+                    value={scenario.targetTime}
+                    onChange={(e) => onSetTargetTime(e.target.value)}
+                    className="w-full bg-transparent text-zinc-100 text-[14px] font-bold outline-none cursor-pointer appearance-none tracking-wide"
+                    style={{ colorScheme: 'dark' }}
+                  />
+                </div>
+                <div className="w-10 h-10 flex items-center justify-center bg-amber-500/10 rounded-lg mr-1 group-hover:bg-amber-500/20 transition-colors cursor-pointer">
+                  <Clock size={16} className="text-amber-500" />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -178,30 +172,7 @@ export default React.memo(function SimulationPanel({
             baseTotal={result?.totalOnline}
           />
 
-          {/* Custom Buildings List */}
-          {scenario.customBuildings.length > 0 && (
-            <div className="border-b border-white/5">
-              <div className="px-4 py-3 bg-zinc-900/40">
-                <span className="text-[11px] text-zinc-400 font-bold uppercase tracking-[0.1em] mb-2 block">
-                  Tòa nhà ảo đã tạo
-                </span>
-                <div className="flex flex-col gap-2">
-                  {scenario.customBuildings.map((b) => (
-                    <div key={b.id} className="flex justify-between items-center bg-white/5 border border-white/10 rounded-xl px-3 py-2">
-                      <span className="text-zinc-200 text-xs font-medium">{b.name}</span>
-                      <button
-                        onClick={() => onRemoveCustomBuilding(b.id)}
-                        className="text-red-400 hover:text-red-300 transition-colors p-1"
-                        title="Xóa tòa nhà"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+
 
           {/* Error */}
           {error && (
@@ -262,15 +233,6 @@ export default React.memo(function SimulationPanel({
             )}
           </div>
 
-          {/* Color Legend */}
-          <div className="px-4 pt-3 pb-4 border-t border-white/5 bg-black/20 mt-auto rounded-b-2xl">
-            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block">Density Scale</span>
-            <div className="h-2.5 rounded-full bg-gradient-to-r from-[#1e3cb4] via-[#00c8a0] via-[#ffdc00] to-[#dc1e14] opacity-90 shadow-inner" />
-            <div className="flex justify-between mt-1.5">
-              <span className="text-[10px] font-medium text-zinc-500">Thấp</span>
-              <span className="text-[10px] font-medium text-zinc-500">Cao</span>
-            </div>
-          </div>
         </div>
       )}
     </div>

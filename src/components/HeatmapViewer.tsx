@@ -6,9 +6,6 @@ import ReactMap, { Marker } from 'react-map-gl/maplibre';
 import maplibregl from 'maplibre-gl';
 import { useHeatmapData } from '../hooks/useHeatmapData';
 import { useSimulation } from '../hooks/useSimulation';
-import { getQuickPicks } from '../utils/heatmapHelpers';
-import { generateCampusGrid, mergeSelectedCells, validateCustomBuilding } from '../utils/geoValidation';
-import type { GridCell } from '../utils/geoValidation';
 import { apiFetch } from '../utils/api';
 import type { ViewState, CellData, PoiData, BuildingPolygonData, WayData } from '../types/heatmap';
 import {
@@ -17,7 +14,6 @@ import {
   MAP_STYLE,
   COLOR_RANGE,
 } from '../constants/heatmap';
-import ControlPanel from './ControlPanel';
 import SimulationPanel from './SimulationPanel';
 import ZoneDetailPanel from './ZoneDetailPanel';
 import BuildingDetailPanel from './BuildingDetailPanel';
@@ -29,15 +25,11 @@ export default function HeatmapViewer() {
 
   const {
     data: observationData,
-    lastUpdated,
     targetDateStr,
     setTargetDateStr,
     selectedCell,
     setSelectedCell,
-    connStatus: obsConnStatus,
     loading: obsLoading,
-    errorMsg: obsErrorMsg,
-    buildingDensity: obsBuildingDensity,
     isLive,
     globalReasons,
     poiReasons,
@@ -67,68 +59,6 @@ export default function HeatmapViewer() {
   const [hoveredBuildingName, setHoveredBuildingName] = useState<string>('');
   const [rawMapStyle, setRawMapStyle] = useState<Record<string, unknown> | null>(null);
 
-  // Drawing mode state
-  const [isDrawingMode, setIsDrawingMode] = useState(false);
-  const [gridCells, setGridCells] = useState<GridCell[]>([]);
-  const [selectedGridCellIds, setSelectedGridCellIds] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    if (isDrawingMode && gridCells.length === 0) {
-      setGridCells(generateCampusGrid(5)); // 5 meters resolution
-    }
-  }, [isDrawingMode, gridCells.length]);
-
-  const handleFinishDrawing = useCallback(() => {
-    if (selectedGridCellIds.size === 0) {
-      alert("Vui lòng chọn ít nhất 1 ô lưới trên bản đồ.");
-      return;
-    }
-    const selectedPolygons = gridCells
-      .filter((c) => selectedGridCellIds.has(c.id))
-      .map((c) => c.polygon);
-    
-    const merged = mergeSelectedCells(selectedPolygons);
-    if (!merged) {
-      alert("Lỗi khi ghép các ô lưới.");
-      return;
-    }
-
-    const validation = validateCustomBuilding(merged, buildingPolygons, ways);
-    if (!validation.isValid) {
-      alert(validation.error);
-      return;
-    }
-
-    const buildingName = prompt("Nhập tên cho Tòa nhà / Khu vực ảo này:");
-    if (!buildingName) return;
-
-    // Convert GeoJSON Polygon coordinates to number[][]
-    // For Polygon, coordinates is number[][][], we take the first ring
-    let coords: number[][] = [];
-    if (merged.geometry.type === 'Polygon') {
-      coords = merged.geometry.coordinates[0] as number[][];
-    } else if (merged.geometry.type === 'MultiPolygon') {
-      coords = merged.geometry.coordinates[0][0] as number[][];
-    }
-
-    const newBuilding: BuildingPolygonData = {
-      id: `virtual-building-${Date.now()}`,
-      name: buildingName,
-      category: 'VIRTUAL',
-      fillColor: [56, 189, 248, 160],
-      coordinates: coords,
-    };
-
-    sim.addCustomBuilding(newBuilding);
-    setIsDrawingMode(false);
-    setSelectedGridCellIds(new Set());
-  }, [selectedGridCellIds, gridCells, buildingPolygons, ways, sim]);
-
-  const handleCancelDrawing = useCallback(() => {
-    setIsDrawingMode(false);
-    setSelectedGridCellIds(new Set());
-  }, []);
-
   const poisRef = useRef<PoiData[]>([]);
 
   useEffect(() => {
@@ -143,7 +73,6 @@ export default function HeatmapViewer() {
     return observationData;
   }, [mode, sim.result, observationData]);
 
-  const connStatus = mode === 'simulation' ? 'simulation' as const : obsConnStatus;
   const loading = mode === 'simulation' ? sim.loading : obsLoading;
 
   // Compute building density for either mode
@@ -370,7 +299,7 @@ export default function HeatmapViewer() {
       [105.7, 21.1]
     ];
 
-    return [
+    const layersArray: any[] = [
         new PathLayer({
           id: 'ways-layer',
           data: ways,
@@ -501,16 +430,7 @@ export default function HeatmapViewer() {
           filled: true,
         }),
         
-        // ─── 0. Campus Mask (Inverted Polygon) ───
-        new PolygonLayer({
-          id: 'campus-mask-layer',
-          data: [{ polygon: [WORLD_POLYGON, campusPolygon] }],
-          getPolygon: (d: { polygon: [number, number][][] }) => d.polygon,
-          getFillColor: [0, 0, 0, 200],
-          getLineColor: [0, 0, 0, 200],
-          lineWidthMinPixels: 2,
-          pickable: false,
-        }),
+
 
         new TextLayer({
           id: 'building-labels',
@@ -556,43 +476,11 @@ export default function HeatmapViewer() {
         })
     ];
 
-      if (isDrawingMode) {
-        layersArray.push(
-          new PolygonLayer({
-            id: 'drawing-grid-layer',
-            data: gridCells,
-            pickable: true,
-            stroked: true,
-            filled: true,
-            getPolygon: (d: any) => d.polygon.geometry.coordinates as number[][][],
-            getFillColor: (d: any) => selectedGridCellIds.has(d.id) ? [245, 158, 11, 160] : [0, 0, 0, 0],
-            getLineColor: () => [255, 255, 255, 60],
-            getLineWidth: () => 1.5,
-          })
-        );
-      }
-
       return layersArray;
-  }, [displayData, selectedCell, setSelectedCell, pois, ways, setSelectedPoi, buildingPolygons, hoveredBuildingName, viewState.zoom, campusPolygon, selectedPoi, mode, closedBuildingIds, sim.scenario.virtualEvents, isDrawingMode, gridCells, selectedGridCellIds]);
+  }, [displayData, selectedCell, setSelectedCell, pois, ways, setSelectedPoi, buildingPolygons, hoveredBuildingName, viewState.zoom, campusPolygon, selectedPoi, mode, closedBuildingIds, sim.scenario.virtualEvents]);
 
   /* ── Map click → find nearest cell or building ── */
   const handleClick = (info: { layer?: { id: string }; coordinate?: number[]; object?: unknown }) => {
-    if (isDrawingMode && info.layer?.id === 'drawing-grid-layer') {
-      const cell = info.object as GridCell;
-      if (cell) {
-        setSelectedGridCellIds((prev) => {
-          const next = new Set(prev);
-          if (next.has(cell.id)) {
-            next.delete(cell.id);
-          } else {
-            next.add(cell.id);
-          }
-          return next;
-        });
-      }
-      return;
-    }
-
     if (info.layer?.id === 'building-labels') return;
     if (info.layer?.id === 'custom-building-polygons') return;
     if (info.layer?.id === 'selected-cell-highlight') return;
@@ -630,8 +518,6 @@ export default function HeatmapViewer() {
     }
   };
 
-  const quickPicks = useMemo(() => getQuickPicks(), []);
-
   // Display reasons depending on mode
   const displayGlobalReasons = mode === 'simulation' && sim.result
     ? sim.result.globalReasons
@@ -641,8 +527,34 @@ export default function HeatmapViewer() {
     : poiReasons;
 
   return (
-    <div className="relative w-full h-full overflow-hidden" style={{ background: '#0a0a0f' }}>
+    <div className="relative w-full h-full overflow-hidden" style={{ background: '#f3efea' }}>
       
+      {/* ── Top Center Overlays ─────────── */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20 pointer-events-auto transition-transform duration-300">
+        {/* Mode Toggle */}
+          <div className="flex bg-zinc-950/80 backdrop-blur-2xl rounded-full p-1 shadow-2xl border border-white/10 transition-all">
+            <button
+              onClick={() => handleModeChange('observation')}
+              className={`px-6 py-2.5 text-[13px] font-bold border-none cursor-pointer rounded-full transition-all duration-300 flex items-center gap-2 ${
+                mode === 'observation'
+                  ? 'bg-zinc-100 text-zinc-900 shadow-lg'
+                  : 'bg-transparent text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              🔭 Quan sát
+            </button>
+            <button
+              onClick={() => handleModeChange('simulation')}
+              className={`px-6 py-2.5 text-[13px] font-bold border-none cursor-pointer rounded-full transition-all duration-300 flex items-center gap-2 ${
+                mode === 'simulation'
+                  ? 'bg-amber-500 text-black shadow-[0_4px_20px_rgba(245,158,11,0.3)]'
+                  : 'bg-transparent text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              🔬 Giả lập
+            </button>
+          </div>
+      </div>
       {/* ── Simulation Mode Banner ─────────── */}
       {mode === 'simulation' && (
         <div
@@ -701,17 +613,61 @@ export default function HeatmapViewer() {
 
       {/* ── Control / Simulation Panel ───────── */}
       {mode === 'observation' ? (
-        <ControlPanel
-          panelCollapsed={panelCollapsed}
-          setPanelCollapsed={setPanelCollapsed}
-          connStatus={connStatus}
-          lastUpdated={lastUpdated}
-          errorMsg={obsErrorMsg}
-          isLive={isLive}
-          targetDateStr={targetDateStr}
-          setTargetDateStr={setTargetDateStr}
-          quickPicks={quickPicks}
-        />
+        <>
+          {/* Bottom Center Time Bar */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-zinc-950/80 backdrop-blur-2xl border border-white/10 p-2 pl-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-10 pointer-events-auto">
+            {/* LIVE Status */}
+            {isLive ? (
+              <button 
+                onClick={() => setTargetDateStr('')}
+                className="flex items-center gap-2 mr-1 group"
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-[pulse_1.5s_ease-in-out_infinite] shadow-[0_0_10px_rgba(239,68,68,0.6)]" />
+                <span className="text-[12px] font-bold text-red-500 uppercase tracking-widest group-hover:text-red-400 transition-colors">TRỰC TIẾP</span>
+              </button>
+            ) : (
+              <button 
+                onClick={() => setTargetDateStr('')}
+                className="flex items-center gap-2 mr-1 group transition-opacity"
+                title="Quay lại Trực tiếp"
+              >
+                <span className="w-2 h-2 rounded-full bg-zinc-500 group-hover:bg-emerald-400 transition-colors" />
+                <span className="text-[12px] font-bold text-zinc-400 uppercase tracking-widest group-hover:text-emerald-400 transition-colors">Lịch sử</span>
+              </button>
+            )}
+
+            <div className="h-4 w-px bg-white/20 mx-1"></div>
+
+            {/* Custom styled time input */}
+            <div className="relative flex items-center bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/10 hover:border-violet-500/50 rounded-xl px-3 py-1.5 transition-all duration-300 shadow-inner group cursor-pointer mr-1">
+               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400 mr-2 group-hover:text-violet-300 transition-colors"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+               <input
+                  type="datetime-local"
+                  value={targetDateStr}
+                  onChange={(e) => setTargetDateStr(e.target.value)}
+                  className="bg-transparent text-zinc-100 text-[13px] font-bold outline-none cursor-pointer appearance-none tracking-wide"
+                  style={{ colorScheme: 'dark' }}
+                />
+            </div>
+          </div>
+
+          {/* Density Scale minimal at bottom right */}
+          <div className="absolute bottom-6 right-6 z-10 pointer-events-none bg-zinc-950/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-3 shadow-2xl">
+             <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block text-center">
+              Mật độ
+            </span>
+            <div
+              className="h-1.5 w-32 rounded-full opacity-90 shadow-inner mb-1"
+              style={{
+                background: 'linear-gradient(90deg, #1e3cb4, #0096dc, #00c8a0, #50d264, #b4dc32, #ffdc00, #ff9600, #dc1e14)',
+              }}
+            />
+            <div className="flex justify-between px-0.5">
+              <span className="text-[8px] font-bold text-zinc-500">Thấp</span>
+              <span className="text-[8px] font-bold text-zinc-500">Cao</span>
+            </div>
+          </div>
+        </>
       ) : (
         <SimulationPanel
           scenario={sim.scenario}
@@ -730,7 +686,6 @@ export default function HeatmapViewer() {
           onRunSimulation={sim.runSimulation}
           onResetAll={sim.resetAll}
           onExitSimulation={() => handleModeChange('observation')}
-          quickPicks={quickPicks}
           panelCollapsed={panelCollapsed}
           setPanelCollapsed={setPanelCollapsed}
         />
@@ -755,67 +710,8 @@ export default function HeatmapViewer() {
         />
       )}
 
-      {/* Button to activate drawing mode in Simulation Panel */}
-      {!isDrawingMode && mode === 'simulation' && (
-        <div className={`absolute top-4 ${panelCollapsed ? 'right-4' : 'right-[400px]'} transition-all duration-300 z-10 pointer-events-auto`}>
-          <button
-            onClick={() => setIsDrawingMode(true)}
-            className="flex items-center gap-2 bg-[#1e1e24]/90 backdrop-blur-md border border-amber-500/30 text-amber-500 px-4 py-2 rounded-xl shadow-lg hover:bg-amber-500/10 transition-colors font-medium text-sm"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M3 12h18"/><path d="M3 3h18v18H3z"/></svg>
-            Vẽ tòa nhà ảo
-          </button>
-        </div>
-      )}
-
       {/* Bottom Overlays */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-10 pointer-events-auto transition-transform duration-300">
-        {/* Drawing Toolbar */}
-        {isDrawingMode && (
-          <div className="flex items-center gap-3 bg-[#1e1e24]/90 backdrop-blur-xl border border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)] rounded-2xl p-2 px-4">
-            <span className="text-amber-500 font-medium mr-2 text-sm">
-              <span className="animate-pulse mr-2">●</span> Đang vẽ tòa nhà
-            </span>
-            <button
-              onClick={handleFinishDrawing}
-              className="bg-amber-500 hover:bg-amber-400 text-black px-4 py-1.5 rounded-xl font-medium text-sm transition-colors"
-            >
-              Hoàn tất
-            </button>
-            <button
-              onClick={handleCancelDrawing}
-              className="bg-white/10 hover:bg-white/20 text-white px-4 py-1.5 rounded-xl font-medium text-sm transition-colors"
-            >
-              Hủy
-            </button>
-          </div>
-        )}
-
-        {/* Mode Toggle */}
-        {!isDrawingMode && (
-          <div className="flex bg-[#1e1e24]/80 backdrop-blur-md rounded-2xl p-1 shadow-2xl border border-white/5 transition-all">
-            <button
-              onClick={() => handleModeChange('observation')}
-              className={`px-4 py-2 text-xs font-bold border-none cursor-pointer transition-all duration-200 flex items-center gap-1.5 ${
-                mode === 'observation'
-                  ? 'bg-gradient-to-br from-violet-400/25 to-sky-400/15 text-violet-300'
-                  : 'bg-transparent text-zinc-500'
-              }`}
-            >
-              🔭 Quan sát
-            </button>
-            <button
-              onClick={() => handleModeChange('simulation')}
-              className={`px-4 py-2 text-xs font-bold border-none border-l border-white/5 cursor-pointer transition-all duration-200 flex items-center gap-1.5 ${
-                mode === 'simulation'
-                  ? 'bg-gradient-to-br from-amber-500/25 to-amber-600/15 text-amber-500'
-                  : 'bg-transparent text-zinc-500'
-              }`}
-            >
-              🔬 Giả lập
-            </button>
-          </div>
-        )}
       </div>
 
       {/* ── Dynamic AI model predicting overlay ── */}

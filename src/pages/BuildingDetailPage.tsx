@@ -114,7 +114,7 @@ export const BuildingDetailPage: React.FC = () => {
 
       {/* Rooms Section */}
       <div className="bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 backdrop-blur-xl shadow-xl">
-        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
           <Box className="text-pink-500" size={20} />
           Danh sách Phòng
         </h2>

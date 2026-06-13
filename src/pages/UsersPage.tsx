@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useFetch } from '../hooks/useFetch';
+import { useNavigate } from 'react-router-dom';
 import { Users, Search, Plus, Loader2 } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
 
@@ -8,6 +9,7 @@ export const UsersPage: React.FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
   const size = 10;
+  const navigate = useNavigate();
 
   // Debounce search input
   useEffect(() => {
@@ -31,13 +33,13 @@ export const UsersPage: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
             <Users className="text-blue-500" size={32} />
-            Users
+            Quản lý Người dùng
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Manage simulated entities and players</p>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2">Quản lý người chơi và các thực thể mô phỏng</p>
         </div>
         <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-blue-500/20">
           <Plus size={20} />
-          Add User
+          Thêm Người dùng
         </button>
       </div>
 
@@ -47,7 +49,7 @@ export const UsersPage: React.FC = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500" size={20} />
             <input 
               type="text"
-              placeholder="Search users..."
+              placeholder="Tìm kiếm người dùng..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-500 transition-all"
@@ -58,26 +60,30 @@ export const UsersPage: React.FC = () => {
         {isLoading ? (
           <div className="flex justify-center items-center py-20 text-zinc-500">
             <Loader2 className="animate-spin mr-3" size={24} />
-            Loading users...
+            Đang tải danh sách người dùng...
           </div>
         ) : error ? (
           <div className="text-red-400 py-10 text-center bg-red-400/10 rounded-xl">
-            Failed to load users. Please try again.
+            Lỗi khi tải danh sách. Vui lòng thử lại.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
-                  <th className="pb-4 font-medium px-4">User</th>
-                  <th className="pb-4 font-medium px-4">Phone Number</th>
-                  <th className="pb-4 font-medium px-4">Role</th>
-                  <th className="pb-4 font-medium px-4 text-right">Actions</th>
+                  <th className="pb-4 font-medium px-4">Người dùng</th>
+                  <th className="pb-4 font-medium px-4">Số điện thoại</th>
+                  <th className="pb-4 font-medium px-4">Vai trò</th>
+                  <th className="pb-4 font-medium px-4 text-right">Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user: any) => (
-                  <tr key={user.id} className="border-b border-zinc-200/80 dark:border-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 transition-colors">
+                  <tr 
+                    key={user.id} 
+                    onClick={() => navigate(`/users/${user.id}`)}
+                    className="border-b border-zinc-200/80 dark:border-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 transition-colors cursor-pointer"
+                  >
                     <td className="py-4 px-4 font-medium text-zinc-800 dark:text-zinc-200">
                       <div className="flex items-center gap-3">
                         <img 
@@ -101,8 +107,14 @@ export const UsersPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-4 px-4 text-right">
-                      <button className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-blue-400 px-3 py-1.5 rounded-lg hover:bg-blue-400/10 transition-colors">
-                        Edit
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/users/${user.id}`);
+                        }}
+                        className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-blue-400 px-3 py-1.5 rounded-lg hover:bg-blue-400/10 transition-colors"
+                      >
+                        Chi tiết
                       </button>
                     </td>
                   </tr>
@@ -110,7 +122,7 @@ export const UsersPage: React.FC = () => {
                 {users.length === 0 && (
                   <tr>
                     <td colSpan={5} className="py-10 text-center text-zinc-500">
-                      No users found matching your search.
+                      Không tìm thấy người dùng nào phù hợp.
                     </td>
                   </tr>
                 )}

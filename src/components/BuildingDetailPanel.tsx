@@ -38,160 +38,88 @@ export default React.memo(function BuildingDetailPanel({
   const { data: buildingData } = useFetch<any>(`/buildings/${selectedPoi.id}`);
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        zIndex: 10,
-        width: 320,
-        background: 'rgba(15,15,20,0.92)',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 14,
-        overflow: 'hidden',
-        boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)',
-      }}
-    >
+    <div className="absolute bottom-6 right-6 z-10 w-80 bg-zinc-950/90 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.5)]">
       {/* Building Image Cover */}
-      <div style={{ width: '100%', height: 140, position: 'relative', backgroundColor: '#18181b' }}>
+      <div className="w-full h-40 relative bg-zinc-900 group">
         {selectedPoi.id === 'empty-space-click' ? (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#27272a', color: '#a1a1aa', fontSize: 18, fontWeight: 600 }}>
+          <div className="w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-400 text-lg font-bold">
             Bãi đất trống
           </div>
         ) : (
           <img 
-            src={`https://picsum.photos/seed/${selectedPoi.id}/320/140`} 
+            src={`https://picsum.photos/seed/${selectedPoi.id}/320/160`} 
             alt={selectedPoi.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
-              e.currentTarget.src = 'https://placehold.co/320x140/18181b/52525b?text=No+Image';
+              e.currentTarget.src = 'https://placehold.co/320x160/18181b/52525b?text=No+Image';
             }}
           />
         )}
-        {/* Gradient overlay to make text more readable if we ever put text over it, and to blend with panel */}
-        <div style={{ 
-          position: 'absolute', 
-          inset: 0, 
-          background: 'linear-gradient(to top, rgba(15,15,20,1) 0%, rgba(15,15,20,0.4) 60%, transparent 100%)' 
-        }} />
+        {/* Gradient overlay to make text more readable */}
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
         
-        {/* Close Button overlaying the image */}
+        {/* Close Button */}
         <button
           onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: 12,
-            right: 12,
-            width: 28,
-            height: 28,
-            borderRadius: '50%',
-            background: 'rgba(15,15,20,0.6)',
-            backdropFilter: 'blur(4px)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: '#e4e4e7',
-            cursor: 'pointer',
-            fontSize: 14,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10,
-            transition: 'all 0.2s',
-          }}
-          onMouseOver={(e) => e.currentTarget.style.background = 'rgba(15,15,20,0.8)'}
-          onMouseOut={(e) => e.currentTarget.style.background = 'rgba(15,15,20,0.6)'}
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-zinc-950/60 backdrop-blur-md border border-white/10 text-zinc-200 cursor-pointer flex items-center justify-center z-10 transition-colors hover:bg-zinc-950/80"
         >
-          ✕
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
 
-      <div style={{ padding: '0 16px 16px 16px', position: 'relative', marginTop: '-20px', zIndex: 5 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="px-5 pb-5 relative -mt-6 z-10">
+        <div className="flex justify-between items-start">
           <div>
-            <div
-              style={{
-                fontSize: 17,
-                fontWeight: 700,
-                color: '#fafafa',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                maxWidth: '280px',
-                textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-              }}
-            >
-              <span 
-                style={{ 
-                  overflow: 'hidden', 
-                  textOverflow: 'ellipsis', 
-                  whiteSpace: 'nowrap' 
-                }}
-                title={selectedPoi.name}
-              >
+            <div className="text-xl font-bold text-zinc-50 flex items-center gap-2 max-w-[260px] drop-shadow-md">
+              <span className="truncate" title={selectedPoi.name}>
                 {selectedPoi.name}
               </span>
-
             </div>
-            <div style={{ fontSize: 10, color: '#52525b', marginTop: 2, fontFamily: 'monospace' }}>
+            <div className="text-xs text-zinc-500 mt-1 font-mono">
               {selectedPoi.lat.toFixed(5)}, {selectedPoi.lng.toFixed(5)}
             </div>
           </div>
         </div>
       </div>
-      <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <div
-          style={{
-            background: 'rgba(56,189,248,0.08)',
-            border: '1px solid rgba(56,189,248,0.15)',
-            borderRadius: 10,
-            padding: '10px 12px',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 9,
-              fontWeight: 600,
-              color: '#38bdf8',
-              textTransform: 'uppercase',
-              letterSpacing: '0.06em',
-            }}
-          >
+
+      <div className="px-5 pb-6 flex flex-col gap-3">
+        <div className="bg-sky-400/10 border border-sky-400/20 rounded-2xl p-4">
+          <div className="text-[10px] font-bold text-sky-400 uppercase tracking-wider">
             Số lượng người dự kiến
           </div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: '#38bdf8', marginTop: 2 }}>
+          <div className="text-3xl font-extrabold text-sky-400 mt-1">
             {(() => {
               const rounded = Math.round(poiTotalDensity * 10) / 10;
               const lower = Math.floor(rounded);
               const upper = Math.ceil(rounded);
-              return lower === upper ? `${lower}` : `Khoảng ${lower}-${upper}`;
+              return lower === upper ? `${lower}` : `~${lower}-${upper}`;
             })()}
           </div>
-          <div style={{ fontSize: 9, color: '#52525b' }}>người</div>
+          <div className="text-xs text-zinc-400 mt-1 font-medium">người</div>
         </div>
 
         {buildingData && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
-              <div style={{ fontSize: 10, color: '#a1a1aa', marginBottom: 4 }}>Số tầng</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#fafafa' }}>{buildingData.floorCount || 0}</div>
+          <div className="grid grid-cols-2 gap-3 mt-1">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-3 text-center">
+              <div className="text-xs text-zinc-400 mb-1 font-medium">Số tầng</div>
+              <div className="text-xl font-bold text-zinc-100">{buildingData.floorCount || 0}</div>
             </div>
-            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
-              <div style={{ fontSize: 10, color: '#a1a1aa', marginBottom: 4 }}>Số phòng</div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#fafafa' }}>{buildingData.roomCount || 0}</div>
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-3 text-center">
+              <div className="text-xs text-zinc-400 mb-1 font-medium">Số phòng</div>
+              <div className="text-xl font-bold text-zinc-100">{buildingData.roomCount || 0}</div>
             </div>
           </div>
         )}
 
-
         {/* ── Dynamic AI model predicting overlay ── */}
         {allReasons.length > 0 && (
-          <div style={{ marginTop: 8, padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: '#e4e4e7', marginBottom: 8 }}>Nguyên nhân:</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div className="mt-2 p-4 bg-white/5 rounded-2xl border border-white/10">
+            <div className="text-[13px] font-bold text-zinc-200 mb-3">Nguyên nhân:</div>
+            <div className="flex flex-col gap-2.5">
               {allReasons.map((r, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-                  <span style={{ color: '#10b981', fontSize: 13, lineHeight: '16px' }}>✓</span>
-                  <span style={{ fontSize: 12, color: '#a1a1aa', lineHeight: '16px' }}>{r}</span>
+                <div key={i} className="flex items-start gap-2.5">
+                  <span className="text-emerald-500 text-sm mt-0.5"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  <span className="text-[13px] text-zinc-400 leading-tight">{r}</span>
                 </div>
               ))}
             </div>
