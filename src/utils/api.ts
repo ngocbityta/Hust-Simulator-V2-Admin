@@ -10,7 +10,8 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`/api${endpoint}`, {
+  const baseUrl = import.meta.env.VITE_API_URL || 'https://hustsimulator.id.vn/api';
+  const response = await fetch(`${baseUrl}${endpoint}`, {
     ...options,
     headers,
   });

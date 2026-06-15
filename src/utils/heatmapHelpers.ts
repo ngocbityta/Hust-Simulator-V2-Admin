@@ -31,19 +31,11 @@ export function getQuickPicks(): QuickPickItem[] {
 }
 
 export function getBackendConfig(): BackendConfig {
-  const isHttps = window.location.protocol === 'https:';
-  const hostName = window.location.hostname;
-  const currentPort = window.location.port;
-
-  let apiPort = currentPort;
-  if (currentPort !== '80' && currentPort !== '443') {
-    apiPort = isHttps ? '443' : '80';
-  }
-
-  const backendHost = hostName ? `${hostName}:${apiPort}` : 'localhost:80';
+  const httpBase = import.meta.env.VITE_API_URL || 'https://hustsimulator.id.vn/api';
+  const wsBase = import.meta.env.VITE_WS_URL || 'wss://hustsimulator.id.vn/ws';
 
   return {
-    httpBase: `${isHttps ? 'https' : 'http'}://${backendHost}`,
-    wsBase: `${isHttps ? 'wss' : 'ws'}://${backendHost}`
+    httpBase,
+    wsBase
   };
 }
