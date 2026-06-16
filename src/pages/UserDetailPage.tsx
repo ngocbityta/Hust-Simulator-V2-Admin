@@ -19,18 +19,20 @@ export const UserDetailPage: React.FC = () => {
   const [viewState, setViewState] = useState<ViewState>(INITIAL_VIEW_STATE);
 
   // Fetch Passive Data (STTF)
-  const { data: passiveData, isLoading: isLoadingPassive } = useFetch<any[]>(
+  const { data: passiveDataRaw, isLoading: isLoadingPassive } = useFetch<any>(
     `/prediction-data/checkin-sequences/${id}`
   );
+  const passiveData = passiveDataRaw?.content || (Array.isArray(passiveDataRaw) ? passiveDataRaw : null);
 
   // Fetch Active Data (Journeys)
-  const { data: activeJourneys, isLoading: isLoadingActive } = useFetch<any[]>(
+  const { data: activeJourneysRaw, isLoading: isLoadingActive } = useFetch<any>(
     `/journeys/user/${id}`
   );
+  const activeJourneys = activeJourneysRaw?.content || (Array.isArray(activeJourneysRaw) ? activeJourneysRaw : null);
 
   // Fetch Buildings for mapping POI ID to Name and Location
   const { data: buildingsData } = useFetch<any>('/buildings/active');
-  const buildings = buildingsData?.content || [];
+  const buildings = buildingsData?.content || (Array.isArray(buildingsData) ? buildingsData : []);
 
   const buildingMap = useMemo(() => {
     const map = new Map();
@@ -103,21 +105,24 @@ export const UserDetailPage: React.FC = () => {
 
     // Draw lines connecting check-ins for passive tab to show sequence
     if (activeTab === 'passive' && chronologicalCheckins.length > 1) {
-      const pathData = [{
-        path: chronologicalCheckins.filter(c => c.lng && c.lat).map(c => [c.lng, c.lat]),
-        color: [255, 100, 100, 200]
-      }];
-      
-      result.push(
-        new PathLayer({
-          id: 'passive-sequence-path',
-          data: pathData,
-          getPath: d => d.path,
-          getColor: d => d.color as any,
-          getWidth: 3,
-          widthMinPixels: 2,
-        })
-      );
+      const validPathCoords = chronologicalCheckins.filter(c => c.lng && c.lat).map(c => [c.lng, c.lat]);
+      if (validPathCoords.length > 1) {
+        const pathData = [{
+          path: validPathCoords,
+          color: [255, 100, 100, 200]
+        }];
+        
+        result.push(
+          new PathLayer({
+            id: 'passive-sequence-path',
+            data: pathData,
+            getPath: d => d.path,
+            getColor: d => d.color as any,
+            getWidth: 3,
+            widthMinPixels: 2,
+          })
+        );
+      }
     }
 
     // Draw active journey paths
