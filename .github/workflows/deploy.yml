@@ -69,5 +69,5 @@ jobs:
     - name: Wait for Rollout to Complete
       run: |-
         echo "⏳ Waiting for admin-ui..."
-        kubectl rollout status deployment ${{ env.IMAGE_NAME }} -n ${{ env.NAMESPACE }} --timeout=300s
+        kubectl rollout status deployment ${{ env.IMAGE_NAME }} -n ${{ env.NAMESPACE }} --timeout=900s
         echo "✅ Admin UI deployed successfully!"
