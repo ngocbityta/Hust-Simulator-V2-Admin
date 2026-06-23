@@ -27,7 +27,11 @@ const NAV_ITEMS = [
   { label: 'Quản lý Sự cố', path: '/issues', icon: AlertTriangle },
 ];
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isCollapsed?: boolean;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
@@ -54,10 +58,11 @@ export const Sidebar: React.FC = () => {
 
       {/* Sidebar */}
       <aside className={`
-        fixed md:sticky top-0 left-0 h-screen w-64 flex flex-col
+        fixed md:sticky top-0 left-0 h-screen flex flex-col
         bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-r border-zinc-200/50 dark:border-zinc-800/50 
-        transition-transform duration-300 ease-in-out z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none
-        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        transition-all duration-300 ease-in-out z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none overflow-hidden
+        ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'}
+        ${!isCollapsed ? 'md:translate-x-0 md:w-64' : 'md:-translate-x-full md:w-0 md:border-r-0'}
       `}>
         {/* Logo Area */}
         <div className="h-16 flex items-center px-6 border-b border-zinc-200/50 dark:border-zinc-800/50">

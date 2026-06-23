@@ -47,7 +47,7 @@ export default React.memo(function BuildingDetailPanel({
           </div>
         ) : (
           <img 
-            src={`https://picsum.photos/seed/${selectedPoi.id}/320/160`} 
+            src={buildingData?.imageUrl || `https://picsum.photos/seed/${selectedPoi.id}/320/160`} 
             alt={selectedPoi.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {

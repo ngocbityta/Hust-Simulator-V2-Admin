@@ -53,6 +53,7 @@ export interface BuildingPolygonData {
   coordinates: number[][];
   fillColor: [number, number, number, number];
   category: string;
+  imageUrl?: string;
 }
 
 export interface BackendConfig {
