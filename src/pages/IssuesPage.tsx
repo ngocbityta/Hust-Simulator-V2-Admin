@@ -24,12 +24,23 @@ export const IssuesPage: React.FC = () => {
   const initialRoomId = searchParams.get('roomId') || '';
   
   const [page, setPage] = useState(0);
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const buildingFilter = initialBuildingId;
   const roomFilter = initialRoomId;
 
+  // Debounce search input
+  React.useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchInput);
+      setPage(0);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchInput]);
+
   const { data, loading, error, refetch } = useFetch<any>(
-    `/issues/paged?page=${page}&size=10&sort=createdAt,desc${statusFilter ? `&status=${statusFilter}` : ''}${buildingFilter ? `&buildingId=${buildingFilter}` : ''}${roomFilter ? `&roomId=${roomFilter}` : ''}`
+    `/issues/paged?page=${page}&size=10&sort=createdAt,desc${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ''}${statusFilter ? `&status=${statusFilter}` : ''}${buildingFilter ? `&buildingId=${buildingFilter}` : ''}${roomFilter ? `&roomId=${roomFilter}` : ''}`
   );
 
   const resolveIssue = async (id: string) => {
@@ -62,7 +73,17 @@ export const IssuesPage: React.FC = () => {
           <p className="text-zinc-500 dark:text-zinc-400 mt-2">Quản lý và giải quyết các sự cố cơ sở vật chất từ sinh viên.</p>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4 sm:mt-0">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={18} />
+            <input 
+              type="text"
+              placeholder="Tìm kiếm theo ID..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full sm:w-64 pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-zinc-900 dark:text-zinc-100 placeholder-zinc-500 transition-all"
+            />
+          </div>
           <div className="relative">
             <select
               className="appearance-none bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 py-2.5 pl-10 pr-10 rounded-xl focus:outline-none focus:border-amber-500 transition-colors"

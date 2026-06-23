@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useFetch } from '../hooks/useFetch';
-import { Calendar, Search, Plus, Loader2 } from 'lucide-react';
+import { Calendar, Search, Plus, Loader2, Clock } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
+
+const formatTime = (timeStr: string) => {
+  if (!timeStr) return '--:-- --/--';
+  const date = new Date(timeStr);
+  return date.toLocaleString('vi-VN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    day: '2-digit',
+    month: '2-digit'
+  });
+};
 
 export const EventsPage: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
@@ -70,7 +81,9 @@ export const EventsPage: React.FC = () => {
               <thead>
                 <tr className="text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
                   <th className="pb-4 font-medium px-4">Tên sự kiện</th>
-                  <th className="pb-4 font-medium px-4">ID Bản đồ</th>
+                  <th className="pb-4 font-medium px-4">Bắt đầu</th>
+                  <th className="pb-4 font-medium px-4">Kết thúc</th>
+                  <th className="pb-4 font-medium px-4">Người tham gia</th>
                   <th className="pb-4 font-medium px-4">Trạng thái</th>
                   <th className="pb-4 font-medium px-4 text-right">Hành động</th>
                 </tr>
@@ -86,7 +99,21 @@ export const EventsPage: React.FC = () => {
                         {event.name || 'Unnamed Event'}
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-zinc-500 text-sm font-mono truncate max-w-[150px]">{event.mapId}</td>
+                    <td className="py-4 px-4 text-zinc-500 font-medium whitespace-nowrap">
+                      <div className="flex items-center gap-1.5">
+                        <Clock size={14} className="text-zinc-400" />
+                        {formatTime(event.startTime)}
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-500 font-medium whitespace-nowrap">
+                      <div className="flex items-center gap-1.5">
+                        <Clock size={14} className="text-zinc-400" />
+                        {formatTime(event.endTime)}
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-500 font-medium">
+                      {event.estimatedParticipants || 0}
+                    </td>
                     <td className="py-4 px-4">
                       <span className="px-2.5 py-1 text-xs font-medium bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20">
                         {event.status || 'ACTIVE'}

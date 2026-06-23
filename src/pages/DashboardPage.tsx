@@ -11,6 +11,7 @@ export const DashboardPage: React.FC = () => {
   const [timeRange, setTimeRange] = React.useState('1d');
   const { data: dashboardData, isLoading: dashboardLoading } = useFetch<any>(`/dashboard/stats?timeRange=${timeRange}`);
   const { data: userStatsData, isLoading: userStatsLoading } = useFetch<any>('/users/stats');
+  const { data: heatmapLatest } = useFetch<any>('/heatmap/latest');
 
   if (dashboardLoading || userStatsLoading) {
     return (
@@ -52,9 +53,12 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard title="Đang Online" value={u.onlineUsers || 0} />
-        <StatCard title="Phòng đang bận" value={`${d.roomsBusy || 0} / ${d.totalRooms || 0}`} />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-8">
+        <StatCard title="Đang Online" value={heatmapLatest?.totalOnline || 0} />
+        <StatCard title="Số tòa nhà" value={d.totalBuildings || 0} />
+        <StatCard title="Số phòng" value={d.totalRooms || 0} />
+        <StatCard title="Phòng đang bận" value={d.roomsBusy || 0} />
+        <StatCard title="Phòng gặp sự cố" value={d.roomsWithIssues || 0} />
         <StatCard title="Sự kiện hoạt động" value={d.eventsOngoing || 0} />
         <StatCard title="Lớp học hoạt động" value={d.recurringEventsOngoing || 0} />
       </div>

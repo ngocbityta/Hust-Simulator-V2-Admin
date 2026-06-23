@@ -53,7 +53,7 @@ export const LoginPage: React.FC = () => {
             <div className="w-16 h-16 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl flex items-center justify-center mb-4 shadow-inner">
               <Activity className="w-8 h-8 text-emerald-500" />
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">HustSim Admin</h1>
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight">HustSim Admin</h1>
             <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Sign in to manage the simulation</p>
           </div>
 
@@ -72,7 +72,7 @@ export const LoginPage: React.FC = () => {
                   type="text"
                   value={phonenumber}
                   onChange={(e) => setPhonenumber(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all text-white placeholder-zinc-600"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-600"
                   placeholder="Enter your phone number"
                   required
                 />
@@ -87,7 +87,7 @@ export const LoginPage: React.FC = () => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all text-white placeholder-zinc-600"
+                  className="w-full pl-12 pr-4 py-3.5 bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-600"
                   placeholder="Enter your password"
                   required
                 />

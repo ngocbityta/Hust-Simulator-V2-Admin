@@ -73,6 +73,7 @@ export const UsersPage: React.FC = () => {
                 <tr className="text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
                   <th className="pb-4 font-medium px-4">Người dùng</th>
                   <th className="pb-4 font-medium px-4">Số điện thoại</th>
+                  <th className="pb-4 font-medium px-4">User ID</th>
                   <th className="pb-4 font-medium px-4">Vai trò</th>
                   <th className="pb-4 font-medium px-4 text-right">Hành động</th>
                 </tr>
@@ -92,11 +93,13 @@ export const UsersPage: React.FC = () => {
                           className="w-10 h-10 rounded-full border border-zinc-300 dark:border-zinc-700"
                         />
                         <div>
-                          <p>{user.username || 'Unknown'}</p>
+                          <p className="font-semibold">{user.fullName || user.username || 'Unknown'}</p>
+                          {user.fullName && <p className="text-xs text-zinc-500">@{user.username}</p>}
                         </div>
                       </div>
                     </td>
                     <td className="py-4 px-4 text-zinc-500 dark:text-zinc-400 font-mono text-sm">{user.phonenumber}</td>
+                    <td className="py-4 px-4 text-zinc-500 dark:text-zinc-400 font-mono text-xs">{user.id}</td>
                     <td className="py-4 px-4">
                       <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${
                         user.role === 'ADMIN' 

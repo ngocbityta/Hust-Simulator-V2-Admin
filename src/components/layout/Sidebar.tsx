@@ -12,7 +12,8 @@ import {
   BarChart3,
   AlertTriangle,
   Sun,
-  Moon
+  Moon,
+  BrainCircuit
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -106,6 +107,22 @@ export const Sidebar: React.FC = () => {
 
         {/* Footer Area */}
         <div className="p-4 border-t border-zinc-200/50 dark:border-zinc-800/50 space-y-2">
+          <button
+            onClick={async () => {
+              try {
+                const { apiFetch } = await import('../../utils/api');
+                await apiFetch('/prediction-data/train', { method: 'POST' });
+                alert('Đã gửi lệnh huấn luyện lại Model STTF bằng dữ liệu mới nhất. Quá trình này sẽ chạy ngầm và mất một lúc.');
+              } catch (e) {
+                alert('Có lỗi xảy ra khi gửi lệnh huấn luyện: ' + e);
+              }
+            }}
+            className="flex items-center px-3 py-2 w-full rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-300 group"
+          >
+            <BrainCircuit size={18} className="mr-3 text-zinc-400 group-hover:text-emerald-500 transition-colors" />
+            <span className="font-medium">Huấn luyện lại AI</span>
+          </button>
+
           <button
             onClick={toggleTheme}
             className="flex items-center px-3 py-2 w-full rounded-xl text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all duration-300 group"
