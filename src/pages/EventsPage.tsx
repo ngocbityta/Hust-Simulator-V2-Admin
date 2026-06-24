@@ -112,12 +112,32 @@ export const EventsPage: React.FC = () => {
                       </div>
                     </td>
                     <td className="py-4 px-4 text-zinc-500 font-medium">
-                      {event.estimatedParticipants || 0}
+                      {(() => {
+                        const status = event.status?.toUpperCase();
+                        if (status === 'SCHEDULED' || status === 'DRAFT') {
+                          return <span className="text-zinc-400 italic font-normal">Chưa diễn ra</span>;
+                        }
+                        return event.actualParticipants ?? event.estimatedParticipants ?? 0;
+                      })()}
                     </td>
                     <td className="py-4 px-4">
-                      <span className="px-2.5 py-1 text-xs font-medium bg-amber-500/10 text-amber-400 rounded-full border border-amber-500/20">
-                        {event.status || 'ACTIVE'}
-                      </span>
+                      {(() => {
+                        const status = event.status?.toUpperCase();
+                        switch (status) {
+                          case 'SCHEDULED':
+                            return <span className="px-2.5 py-1 text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full border border-blue-500/20">Sắp diễn ra</span>;
+                          case 'ONGOING':
+                            return <span className="px-2.5 py-1 text-xs font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full border border-emerald-500/20">Đang diễn ra</span>;
+                          case 'COMPLETED':
+                            return <span className="px-2.5 py-1 text-xs font-medium bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 rounded-full border border-zinc-500/20">Đã kết thúc</span>;
+                          case 'CANCELLED':
+                            return <span className="px-2.5 py-1 text-xs font-medium bg-red-500/10 text-red-600 dark:text-red-400 rounded-full border border-red-500/20">Đã hủy</span>;
+                          case 'DRAFT':
+                            return <span className="px-2.5 py-1 text-xs font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full border border-amber-500/20">Bản nháp</span>;
+                          default:
+                            return <span className="px-2.5 py-1 text-xs font-medium bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 rounded-full border border-zinc-500/20">{status || 'UNKNOWN'}</span>;
+                        }
+                      })()}
                     </td>
                     <td className="py-4 px-4 text-right">
                       <button className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-amber-400 px-3 py-1.5 rounded-lg hover:bg-amber-400/10 transition-colors">

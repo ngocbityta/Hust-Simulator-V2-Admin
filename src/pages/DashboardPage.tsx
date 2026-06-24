@@ -28,7 +28,7 @@ export const DashboardPage: React.FC = () => {
   // Use pre-computed backend data for charts
   const studentBehaviorData = d.studentBehaviorDistribution || [];
   const topNodesData = d.topNodes || [];
-  const roomOccupancyData = d.roomOccupancyByBuilding || [];
+  const usersPerBuildingData = d.usersPerBuilding || [];
   const heatmapData = d.heatmapDensityTimeline || [];
   return (
     <div className="p-8">
@@ -140,12 +140,12 @@ export const DashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Room Occupancy By Building */}
+        {/* Users By Building */}
         <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl p-6 shadow-sm backdrop-blur-xl hover:shadow-md transition-shadow duration-300 lg:col-span-2">
-          <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2"><span className="w-2 h-6 rounded-full bg-rose-500"></span>Công suất Phòng học</h2>
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2"><span className="w-2 h-6 rounded-full bg-rose-500"></span>Số người tại các tòa nhà</h2>
           <div className="h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={roomOccupancyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart data={usersPerBuildingData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                 <XAxis dataKey="buildingName" stroke="#71717a" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis stroke="#71717a" fontSize={12} tickLine={false} axisLine={false} />
@@ -153,9 +153,7 @@ export const DashboardPage: React.FC = () => {
                   cursor={{fill: '#27272a', opacity: 0.4}}
                   contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px' }}
                 />
-                <Legend wrapperStyle={{ color: '#a1a1aa', fontSize: '12px' }} />
-                <Bar dataKey="busyCount" name="Phòng có lớp (Busy)" stackId="a" fill="#ef4444" radius={[0, 0, 4, 4]} maxBarSize={40} />
-                <Bar dataKey="emptyCount" name="Phòng trống (Empty)" stackId="a" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                <Bar dataKey="userCount" name="Số người" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>

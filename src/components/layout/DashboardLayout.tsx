@@ -10,18 +10,11 @@ export const DashboardLayout: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-white dark:bg-zinc-950 text-zinc-50 font-sans overflow-hidden">
-      <Sidebar isCollapsed={isSidebarCollapsed} />
+      <Sidebar isCollapsed={isSidebarCollapsed} onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
       <main className="flex-1 flex flex-col min-w-0 relative">
         {/* Top Navigation Header */}
         <header className="h-16 px-6 lg:px-8 border-b border-zinc-200/50 dark:border-zinc-800/50 flex items-center justify-between bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl sticky top-0 z-30 shadow-sm dark:shadow-none">
           <div className="flex-1 flex items-center gap-4">
-            <button
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className="hidden md:flex p-2 text-zinc-500 hover:text-emerald-500 transition-colors rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
-              title={isSidebarCollapsed ? "Mở sidebar" : "Ẩn sidebar"}
-            >
-              {isSidebarCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
-            </button>
             {/* Optional breadcrumbs or page title could go here */}
             <div className="hidden md:flex relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-emerald-500 transition-colors duration-300" size={18} />

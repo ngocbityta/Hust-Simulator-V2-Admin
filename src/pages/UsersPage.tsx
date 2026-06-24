@@ -3,6 +3,7 @@ import { useFetch } from '../hooks/useFetch';
 import { useNavigate } from 'react-router-dom';
 import { Users, Search, Plus, Loader2 } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
+import { EditUserModal } from '../components/user/EditUserModal';
 
 export const UsersPage: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
@@ -10,6 +11,8 @@ export const UsersPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const size = 10;
   const navigate = useNavigate();
+
+  const [editingUser, setEditingUser] = useState<any>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -110,15 +113,26 @@ export const UsersPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="py-4 px-4 text-right">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/users/${user.id}`);
-                        }}
-                        className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-blue-400 px-3 py-1.5 rounded-lg hover:bg-blue-400/10 transition-colors"
-                      >
-                        Chi tiết
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingUser(user);
+                          }}
+                          className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-amber-500 px-3 py-1.5 rounded-lg hover:bg-amber-500/10 transition-colors"
+                        >
+                          Sửa
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/users/${user.id}`);
+                          }}
+                          className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-blue-500 px-3 py-1.5 rounded-lg hover:bg-blue-500/10 transition-colors"
+                        >
+                          Quản lý hành trình
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -142,6 +156,21 @@ export const UsersPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {editingUser && (
+        <EditUserModal 
+          user={editingUser} 
+          onClose={() => setEditingUser(null)}
+          onSuccess={() => {
+            setEditingUser(null);
+            // Reload page by slightly triggering search or we could add a refetch to useFetch if it returned one.
+            // For now, triggering a tiny timeout search reset
+            const current = searchInput;
+            setSearchInput(current + ' ');
+            setTimeout(() => setSearchInput(current), 50);
+          }}
+        />
+      )}
     </div>
   );
 };

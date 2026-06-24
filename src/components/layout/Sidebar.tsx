@@ -13,7 +13,9 @@ import {
   AlertTriangle,
   Sun,
   Moon,
-  BrainCircuit
+  BrainCircuit,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 
@@ -29,9 +31,10 @@ const NAV_ITEMS = [
 
 interface SidebarProps {
   isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggleCollapse }) => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
@@ -60,10 +63,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
       <aside className={`
         fixed md:sticky top-0 left-0 h-screen flex flex-col
         bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-r border-zinc-200/50 dark:border-zinc-800/50 
-        transition-all duration-300 ease-in-out z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none overflow-hidden
+        transition-all duration-300 ease-in-out z-40 shadow-[4px_0_24px_rgba(0,0,0,0.02)] dark:shadow-none overflow-visible
         ${isOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64'}
         ${!isCollapsed ? 'md:translate-x-0 md:w-64' : 'md:-translate-x-full md:w-0 md:border-r-0'}
       `}>
+        {/* Toggle Collapse Button (Desktop) */}
+        {onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className={`
+              hidden md:flex absolute top-1/2 -right-4 -translate-y-1/2 w-8 h-8 
+              bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700
+              rounded-full items-center justify-center text-zinc-500 hover:text-emerald-500
+              hover:border-emerald-500 transition-all shadow-sm z-50
+            `}
+            title={isCollapsed ? "Mở menu" : "Thu gọn menu"}
+          >
+            {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          </button>
+        )}
         {/* Logo Area */}
         <div className="h-16 flex items-center px-6 border-b border-zinc-200/50 dark:border-zinc-800/50">
           <div className="relative flex items-center justify-center w-8 h-8 mr-3 rounded-lg bg-emerald-500/10 text-emerald-500">

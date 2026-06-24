@@ -69,8 +69,8 @@ export const BuildingsPage: React.FC = () => {
               className="w-full px-4 py-3 bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/50 text-zinc-900 dark:text-zinc-100 transition-all appearance-none cursor-pointer"
               style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2371717a\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.2em' }}
             >
-              <option value="roomCount,desc">Số phòng (Nhiều nhất)</option>
-              <option value="floorCount,desc">Số tầng (Cao nhất)</option>
+              <option value="roomCount,desc">Số phòng</option>
+              <option value="floorCount,desc">Số tầng</option>
               <option value="population24h,desc">Số người đông nhất 24h qua</option>
               <option value="name,asc">Thứ tự bảng chữ cái</option>
             </select>
@@ -95,7 +95,7 @@ export const BuildingsPage: React.FC = () => {
                     {/* Image Placeholder */}
                     <div className="h-48 bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center relative overflow-hidden border-b border-zinc-200/50 dark:border-zinc-800/50">
                       <img 
-                        src={`https://picsum.photos/seed/${building.id}/400/200`} 
+                        src={building.imageUrl || `https://picsum.photos/seed/${building.id}/400/200`} 
                         alt={building.name}
                         className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover/link:opacity-90 group-hover/link:scale-105 transition-all duration-700 ease-out"
                         onError={(e) => {
