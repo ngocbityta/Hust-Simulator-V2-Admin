@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 import type { HeatmapResponse } from '../types/heatmap';
 import type {
   SimulationScenario,
-  WeatherOverride,
   VirtualEvent,
   ClosedFacility,
 } from '../types/simulation';
@@ -14,10 +13,6 @@ export function useSimulation() {
   const [result, setResult] = useState<HeatmapResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const setWeatherOverride = useCallback((weather: WeatherOverride | null) => {
-    setScenario((prev) => ({ ...prev, weatherOverride: weather }));
-  }, []);
 
   const addVirtualEvent = useCallback((event: VirtualEvent) => {
     setScenario((prev) => ({
@@ -88,7 +83,6 @@ export function useSimulation() {
       const body = {
         targetTime: targetMs,
         simulation: {
-          weatherOverride: scenario.weatherOverride,
           virtualEvents: scenario.virtualEvents.map((ve) => ({
             name: ve.name,
             buildingId: ve.buildingId,
@@ -134,7 +128,6 @@ export function useSimulation() {
   }, []);
 
   const hasChanges =
-    scenario.weatherOverride !== null ||
     scenario.virtualEvents.length > 0 ||
     scenario.eventModifications.length > 0 ||
     scenario.closedFacilities.length > 0 ||
@@ -147,7 +140,6 @@ export function useSimulation() {
     loading,
     error,
     hasChanges,
-    setWeatherOverride,
     addVirtualEvent,
     removeVirtualEvent,
     updateVirtualEvent,

@@ -25,12 +25,9 @@ export default function HeatmapViewer() {
 
   const {
     data: observationData,
-    targetDateStr,
-    setTargetDateStr,
     selectedCell,
     setSelectedCell,
     loading: obsLoading,
-    isLive,
     globalReasons,
     poiReasons,
     pause: pauseObservation,
@@ -79,8 +76,10 @@ export default function HeatmapViewer() {
   const buildingDensity = useMemo(() => {
     const m = new Map<string, number>();
     for (const cell of displayData) {
-      for (const [poiName, count] of Object.entries(cell.intents)) {
-        m.set(poiName, (m.get(poiName) || 0) + count);
+      if (cell.intents) {
+        for (const [poiName, count] of Object.entries(cell.intents)) {
+          m.set(poiName, (m.get(poiName) || 0) + count);
+        }
       }
     }
     return m;
@@ -617,37 +616,9 @@ export default function HeatmapViewer() {
           {/* Bottom Center Time Bar */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-zinc-950/80 backdrop-blur-2xl border border-white/10 p-2 pl-5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-10 pointer-events-auto">
             {/* LIVE Status */}
-            {isLive ? (
-              <button 
-                onClick={() => setTargetDateStr('')}
-                className="flex items-center gap-2 mr-1 group"
-              >
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-[pulse_1.5s_ease-in-out_infinite] shadow-[0_0_10px_rgba(239,68,68,0.6)]" />
-                <span className="text-[12px] font-bold text-red-500 uppercase tracking-widest group-hover:text-red-400 transition-colors">TRỰC TIẾP</span>
-              </button>
-            ) : (
-              <button 
-                onClick={() => setTargetDateStr('')}
-                className="flex items-center gap-2 mr-1 group transition-opacity"
-                title="Quay lại Trực tiếp"
-              >
-                <span className="w-2 h-2 rounded-full bg-zinc-500 group-hover:bg-emerald-400 transition-colors" />
-                <span className="text-[12px] font-bold text-zinc-400 uppercase tracking-widest group-hover:text-emerald-400 transition-colors">Lịch sử</span>
-              </button>
-            )}
-
-            <div className="h-4 w-px bg-white/20 mx-1"></div>
-
-            {/* Custom styled time input */}
-            <div className="relative flex items-center bg-zinc-900/50 hover:bg-zinc-800/80 border border-white/10 hover:border-violet-500/50 rounded-xl px-3 py-1.5 transition-all duration-300 shadow-inner group cursor-pointer mr-1">
-               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400 mr-2 group-hover:text-violet-300 transition-colors"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-               <input
-                  type="datetime-local"
-                  value={targetDateStr}
-                  onChange={(e) => setTargetDateStr(e.target.value)}
-                  className="bg-transparent text-zinc-100 text-[13px] font-bold outline-none cursor-pointer appearance-none tracking-wide"
-                  style={{ colorScheme: 'dark' }}
-                />
+            <div className="flex items-center gap-2 mr-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-[pulse_1.5s_ease-in-out_infinite] shadow-[0_0_10px_rgba(239,68,68,0.6)]" />
+              <span className="text-[12px] font-bold text-red-500 uppercase tracking-widest">TRỰC TIẾP</span>
             </div>
           </div>
 
@@ -675,7 +646,6 @@ export default function HeatmapViewer() {
           loading={sim.loading}
           error={sim.error}
           hasChanges={sim.hasChanges}
-          onSetWeather={sim.setWeatherOverride}
           onAddEvent={sim.addVirtualEvent}
           onRemoveEvent={sim.removeVirtualEvent}
           onUpdateEvent={sim.updateVirtualEvent}

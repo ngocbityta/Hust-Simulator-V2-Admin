@@ -1,10 +1,5 @@
 import type { BuildingPolygonData } from './heatmap';
 
-export interface WeatherOverride {
-  temp: number;
-  rain: number;
-}
-
 export interface VirtualEvent {
   id: string;
   name: string;
@@ -31,7 +26,6 @@ export interface ClosedFacility {
 }
 
 export interface SimulationScenario {
-  weatherOverride: WeatherOverride | null;
   virtualEvents: VirtualEvent[];
   eventModifications: EventModification[];
   closedFacilities: ClosedFacility[];
@@ -41,7 +35,6 @@ export interface SimulationScenario {
 }
 
 export const DEFAULT_SCENARIO: SimulationScenario = {
-  weatherOverride: null,
   virtualEvents: [],
   eventModifications: [],
   closedFacilities: [],

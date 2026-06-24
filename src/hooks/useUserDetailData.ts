@@ -106,20 +106,12 @@ export const useUserDetailData = (id: string | undefined, activeTab: Tab) => {
   const [isPredicting, setIsPredicting] = useState<boolean>(false);
 
   const predictLocation = async (targetTimestampMs: number) => {
-    if (!id || passiveCheckins.length === 0) return;
+    if (!id) return;
     setIsPredicting(true);
     setPredictionResults(null);
     try {
-      // Map passive checkins to trajectory DTO
-      const trajectory = passiveCheckins.map((c: any) => ({
-        latitude: c.lat,
-        longitude: c.lng,
-        timestamp: new Date(c.start_time || c.timestamp || new Date()).getTime(),
-      }));
-      
       const payload = {
         userId: id,
-        trajectory,
         targetTimestampMs
       };
       

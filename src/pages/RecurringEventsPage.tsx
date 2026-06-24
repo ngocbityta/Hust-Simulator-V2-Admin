@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useFetch } from '../hooks/useFetch';
-import { Repeat, Search, Plus, Loader2 } from 'lucide-react';
+import { Repeat, Search, Plus, Loader2, Clock } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
+import { EditRecurringEventModal } from '../components/simulation/EditRecurringEventModal';
 
 export const RecurringEventsPage: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
   const size = 10;
+
+  const [editingEvent, setEditingEvent] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Debounce search input
   useEffect(() => {
@@ -35,7 +39,13 @@ export const RecurringEventsPage: React.FC = () => {
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-2">Quản lý các sự kiện lặp lại và lớp học mô phỏng</p>
         </div>
-        <button className="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-purple-500/20">
+        <button 
+          onClick={() => {
+            setEditingEvent(null);
+            setIsModalOpen(true);
+          }}
+          className="bg-purple-500 hover:bg-purple-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-purple-500/20"
+        >
           <Plus size={20} />
           Thêm Lớp học
         </button>
@@ -70,6 +80,9 @@ export const RecurringEventsPage: React.FC = () => {
               <thead>
                 <tr className="text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
                   <th className="pb-4 font-medium px-4">Tên lớp học</th>
+                  <th className="pb-4 font-medium px-4">Lịch (Cron)</th>
+                  <th className="pb-4 font-medium px-4">Thời lượng</th>
+                  <th className="pb-4 font-medium px-4">Trạng thái</th>
                   <th className="pb-4 font-medium px-4 text-right">Hành động</th>
                 </tr>
               </thead>
@@ -77,10 +90,39 @@ export const RecurringEventsPage: React.FC = () => {
                 {events.map((event: any) => (
                   <tr key={event.id} className="border-b border-zinc-200/80 dark:border-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800/20 transition-colors">
                     <td className="py-4 px-4 font-medium text-zinc-800 dark:text-zinc-200">
-                      {event.name || 'Unknown'}
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                          <Repeat size={18} className="text-purple-500" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{event.name || 'Unknown'}</p>
+                          {event.description && <p className="text-xs text-zinc-500 font-normal">{event.description.substring(0, 30)}{event.description.length > 30 ? '...' : ''}</p>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 px-4 text-zinc-500 font-mono text-sm">
+                      {event.cronExpression}
+                    </td>
+                    <td className="py-4 px-4 text-zinc-500 font-medium">
+                      {event.durationMinutes} phút
+                    </td>
+                    <td className="py-4 px-4">
+                      <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${
+                        event.status === 'ACTIVE' 
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+                          : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20'
+                      }`}>
+                        {event.status || 'UNKNOWN'}
+                      </span>
                     </td>
                     <td className="py-4 px-4 text-right">
-                      <button className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-purple-400 px-3 py-1.5 rounded-lg hover:bg-purple-400/10 transition-colors">
+                      <button 
+                        onClick={() => {
+                          setEditingEvent(event);
+                          setIsModalOpen(true);
+                        }}
+                        className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-purple-400 px-3 py-1.5 rounded-lg hover:bg-purple-400/10 transition-colors"
+                      >
                         Sửa
                       </button>
                     </td>
@@ -88,7 +130,7 @@ export const RecurringEventsPage: React.FC = () => {
                 ))}
                 {events.length === 0 && (
                   <tr>
-                    <td colSpan={2} className="py-10 text-center text-zinc-500">
+                    <td colSpan={5} className="py-10 text-center text-zinc-500">
                       Không tìm thấy lớp học nào phù hợp.
                     </td>
                   </tr>
@@ -106,6 +148,23 @@ export const RecurringEventsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {isModalOpen && (
+        <EditRecurringEventModal
+          recurringEvent={editingEvent}
+          onClose={() => {
+            setEditingEvent(null);
+            setIsModalOpen(false);
+          }}
+          onSuccess={() => {
+            setEditingEvent(null);
+            setIsModalOpen(false);
+            const current = searchInput;
+            setSearchInput(current + ' ');
+            setTimeout(() => setSearchInput(current), 50);
+          }}
+        />
+      )}
     </div>
   );
 };

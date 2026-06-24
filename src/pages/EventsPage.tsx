@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useFetch } from '../hooks/useFetch';
 import { Calendar, Search, Plus, Loader2, Clock } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
+import { EditEventModal } from '../components/simulation/EditEventModal';
 
 const formatTime = (timeStr: string) => {
   if (!timeStr) return '--:-- --/--';
@@ -19,6 +20,9 @@ export const EventsPage: React.FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
   const size = 10;
+
+  const [editingEvent, setEditingEvent] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Debounce search input
   useEffect(() => {
@@ -46,7 +50,13 @@ export const EventsPage: React.FC = () => {
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-2">Quản lý các sự kiện và hoạt động mô phỏng</p>
         </div>
-        <button className="bg-amber-500 hover:bg-amber-600 text-zinc-950 px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-amber-500/20">
+        <button 
+          onClick={() => {
+            setEditingEvent(null);
+            setIsModalOpen(true);
+          }}
+          className="bg-amber-500 hover:bg-amber-600 text-zinc-950 px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-amber-500/20"
+        >
           <Plus size={20} />
           Tạo Sự kiện
         </button>
@@ -140,7 +150,13 @@ export const EventsPage: React.FC = () => {
                       })()}
                     </td>
                     <td className="py-4 px-4 text-right">
-                      <button className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-amber-400 px-3 py-1.5 rounded-lg hover:bg-amber-400/10 transition-colors">
+                      <button 
+                        onClick={() => {
+                          setEditingEvent(event);
+                          setIsModalOpen(true);
+                        }}
+                        className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-amber-500 px-3 py-1.5 rounded-lg hover:bg-amber-500/10 transition-colors"
+                      >
                         Sửa
                       </button>
                     </td>
@@ -148,7 +164,7 @@ export const EventsPage: React.FC = () => {
                 ))}
                 {events.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="py-10 text-center text-zinc-500">
+                    <td colSpan={6} className="py-10 text-center text-zinc-500">
                       Không tìm thấy sự kiện nào.
                     </td>
                   </tr>
@@ -166,6 +182,23 @@ export const EventsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {isModalOpen && (
+        <EditEventModal
+          event={editingEvent}
+          onClose={() => {
+            setEditingEvent(null);
+            setIsModalOpen(false);
+          }}
+          onSuccess={() => {
+            setEditingEvent(null);
+            setIsModalOpen(false);
+            const current = searchInput;
+            setSearchInput(current + ' ');
+            setTimeout(() => setSearchInput(current), 50);
+          }}
+        />
+      )}
     </div>
   );
 };

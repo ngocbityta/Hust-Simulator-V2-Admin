@@ -54,8 +54,8 @@ export function useHeatmapData() {
       setErrorMsg(null);
       try {
         const { httpBase } = getBackendConfig();
-        let url = `${httpBase}/api/heatmap/latest-predictive`;
-        if (targetMs) url += `?targetTime=${targetMs}`;
+        let url = `${httpBase}/api/heatmap/latest`;
+        if (targetMs) url = `${httpBase}/api/heatmap/latest-predictive?targetTime=${targetMs}`;
         const res = await fetch(url);
         if (res.ok) {
           updateState(await res.json());
@@ -106,13 +106,13 @@ export function useHeatmapData() {
 
       ws.onopen = () => {
         setConnStatus('live');
-        ws!.send(JSON.stringify({ event: 'predictive_heatmap:subscribe' }));
+        ws!.send(JSON.stringify({ event: 'heatmap:subscribe' }));
       };
 
       ws.onmessage = (e) => {
         try {
           const msg = JSON.parse(e.data);
-          if (msg.event === 'predictive_heatmap:update' && msg.data) {
+          if (msg.event === 'heatmap:update' && msg.data) {
             updateState(msg.data);
           }
         } catch { /* noop */ }
@@ -147,8 +147,10 @@ export function useHeatmapData() {
   const buildingDensity = useMemo(() => {
     const m = new Map<string, number>();
     for (const cell of data) {
-      for (const [poiName, count] of Object.entries(cell.intents)) {
-        m.set(poiName, (m.get(poiName) || 0) + count);
+      if (cell.intents) {
+        for (const [poiName, count] of Object.entries(cell.intents)) {
+          m.set(poiName, (m.get(poiName) || 0) + count);
+        }
       }
     }
     return m;

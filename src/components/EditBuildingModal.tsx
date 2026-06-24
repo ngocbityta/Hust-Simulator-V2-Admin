@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { apiFetch } from '../utils/api';
-import { X, Loader2, Save } from 'lucide-react';
+import { X, Loader2, Save, Upload, Image as ImageIcon } from 'lucide-react';
+import { uploadFile } from '../utils/api';
 
 interface Building {
   id: string;
@@ -101,27 +102,74 @@ export const EditBuildingModal: React.FC<Props> = ({ building, onClose, onSucces
                 className="w-full bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 appearance-none"
                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%2371717a\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.2em' }}
               >
-                <option value="BUILDING">Building</option>
-                <option value="PLAZA">Plaza</option>
-                <option value="DORMITORY">Dormitory</option>
-                <option value="LIBRARY">Library</option>
-                <option value="SPORTS_CENTER">Sports Center</option>
-                <option value="OTHER">Other</option>
+                <option value="BUILDING">Tòa nhà chung</option>
+                <option value="ACADEMIC">Khu giảng đường</option>
+                <option value="PLAZA">Quảng trường / Khu công cộng</option>
+                <option value="DORMITORY">Ký túc xá</option>
+                <option value="LIBRARY">Thư viện</option>
+                <option value="SPORTS_CENTER">Trung tâm thể thao</option>
+                <option value="OTHER">Khác</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1.5">
-                URL Ảnh (tuỳ chọn)
+                Ảnh đại diện tòa nhà
               </label>
-              <input
-                type="url"
-                name="imageUrl"
-                value={formData.imageUrl}
-                onChange={handleChange}
-                placeholder="https://..."
-                className="w-full bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-              />
+              
+              <div className="flex items-center gap-4">
+                {formData.imageUrl ? (
+                  <div className="relative w-24 h-24 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shrink-0">
+                    <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
+                      className="absolute top-1 right-1 bg-black/50 hover:bg-red-500 p-1 rounded-full text-white transition-colors"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="w-24 h-24 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-zinc-400 shrink-0">
+                    <ImageIcon size={28} />
+                  </div>
+                )}
+                
+                <div className="flex-1">
+                  <label className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl cursor-pointer transition-colors font-medium border border-zinc-200 dark:border-zinc-700">
+                    <Upload size={18} />
+                    Tải ảnh lên
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      className="hidden" 
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          setLoading(true);
+                          const url = await uploadFile(file);
+                          if (url) setFormData(prev => ({ ...prev, imageUrl: url }));
+                        } catch (err: any) {
+                          setError(err.message || 'Lỗi upload ảnh');
+                        } finally {
+                          setLoading(false);
+                          e.target.value = ''; // reset input
+                        }
+                      }} 
+                    />
+                  </label>
+                  <p className="text-xs text-zinc-500 mt-2 text-center">Hoặc có thể dán trực tiếp URL ảnh vào ô bên dưới</p>
+                  <input
+                    type="url"
+                    name="imageUrl"
+                    value={formData.imageUrl}
+                    onChange={handleChange}
+                    placeholder="https://..."
+                    className="mt-2 w-full bg-white/50 dark:bg-zinc-950/50 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-1.5 text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  />
+                </div>
+              </div>
             </div>
             
             <label className="flex items-center gap-3 cursor-pointer mt-2">

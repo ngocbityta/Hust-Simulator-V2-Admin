@@ -13,6 +13,7 @@ export const UsersPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Debounce search input
   useEffect(() => {
@@ -40,7 +41,13 @@ export const UsersPage: React.FC = () => {
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-2">Quản lý người chơi và các thực thể mô phỏng</p>
         </div>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-blue-500/20">
+        <button 
+          onClick={() => {
+            setEditingUser(null);
+            setIsModalOpen(true);
+          }}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-blue-500/20"
+        >
           <Plus size={20} />
           Thêm Người dùng
         </button>
@@ -93,7 +100,7 @@ export const UsersPage: React.FC = () => {
                         <img 
                           src={user.avatar || `https://ui-avatars.com/api/?name=${user.username || 'U'}&background=random`} 
                           alt={user.username} 
-                          className="w-10 h-10 rounded-full border border-zinc-300 dark:border-zinc-700"
+                          className="w-10 h-10 rounded-full border border-zinc-300 dark:border-zinc-700 object-cover"
                         />
                         <div>
                           <p className="font-semibold">{user.fullName || user.username || 'Unknown'}</p>
@@ -118,6 +125,7 @@ export const UsersPage: React.FC = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditingUser(user);
+                            setIsModalOpen(true);
                           }}
                           className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-amber-500 px-3 py-1.5 rounded-lg hover:bg-amber-500/10 transition-colors"
                         >
@@ -157,12 +165,16 @@ export const UsersPage: React.FC = () => {
         )}
       </div>
 
-      {editingUser && (
+      {isModalOpen && (
         <EditUserModal 
           user={editingUser} 
-          onClose={() => setEditingUser(null)}
+          onClose={() => {
+            setEditingUser(null);
+            setIsModalOpen(false);
+          }}
           onSuccess={() => {
             setEditingUser(null);
+            setIsModalOpen(false);
             // Reload page by slightly triggering search or we could add a refetch to useFetch if it returned one.
             // For now, triggering a tiny timeout search reset
             const current = searchInput;

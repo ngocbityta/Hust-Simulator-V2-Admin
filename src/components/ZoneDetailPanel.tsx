@@ -28,7 +28,7 @@ export default React.memo(function ZoneDetailPanel({ selectedCell, onClose }: Zo
 
       {/* Building list */}
       <div className="px-3 pt-3 pb-4 overflow-y-auto flex-1 custom-scrollbar space-y-1">
-        {Object.entries(selectedCell.intents)
+        {Object.entries(selectedCell.intents || selectedCell.activities || {})
           .sort(([, a], [, b]) => b - a)
           .map(([poi, count]) => {
             const pct = selectedCell.count > 0 ? (count / selectedCell.count) * 100 : 0;
@@ -59,9 +59,9 @@ export default React.memo(function ZoneDetailPanel({ selectedCell, onClose }: Zo
               </div>
             );
           })}
-        {Object.keys(selectedCell.intents).length === 0 && (
+        {Object.keys(selectedCell.intents || selectedCell.activities || {}).length === 0 && (
           <div className="text-center py-8 text-zinc-500 text-[13px]">
-            Không có điểm đến dự kiến
+            Không có dữ liệu chi tiết
           </div>
         )}
       </div>

@@ -15,7 +15,8 @@ export interface CellData {
   count: number;
   centerLat: number;
   centerLng: number;
-  intents: Record<string, number>;
+  intents?: Record<string, number>;
+  activities?: Record<string, number>;
 }
 
 export interface HeatmapResponse {

@@ -105,7 +105,15 @@ export const BuildingsPage: React.FC = () => {
                       <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/40 to-transparent z-10" />
                       <Building2 className="text-zinc-400/50 dark:text-zinc-600/50 group-hover/link:scale-110 transition-transform duration-700 z-10" size={64} />
                       <span className="absolute bottom-3 left-4 z-20 text-xs font-bold text-emerald-400 uppercase tracking-widest bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded backdrop-blur-md">
-                        {building.category || 'BUILDING'}
+                        {{
+                          'BUILDING': 'Tòa nhà chung',
+                          'ACADEMIC': 'Giảng đường',
+                          'PLAZA': 'Khu công cộng',
+                          'DORMITORY': 'Ký túc xá',
+                          'LIBRARY': 'Thư viện',
+                          'SPORTS_CENTER': 'Khu thể thao',
+                          'OTHER': 'Khác'
+                        }[building.category as string] || building.category || 'TÒA NHÀ'}
                       </span>
                     </div>
                     

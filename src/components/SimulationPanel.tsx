@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import type { SimulationScenario, WeatherOverride, VirtualEvent, ClosedFacility } from '../types/simulation';
-import type { HeatmapResponse, QuickPickItem } from '../types/heatmap';
-import WeatherSection from './simulation/WeatherSection';
+import type { SimulationScenario, VirtualEvent, ClosedFacility } from '../types/simulation';
+import type { HeatmapResponse } from '../types/heatmap';
 import EventsSection from './simulation/EventsSection';
 import FacilitiesSection from './simulation/FacilitiesSection';
 import PopulationSection from './simulation/PopulationSection';
@@ -13,7 +12,6 @@ interface SimulationPanelProps {
   loading: boolean;
   error: string | null;
   hasChanges: boolean;
-  onSetWeather: (weather: WeatherOverride | null) => void;
   onAddEvent: (event: VirtualEvent) => void;
   onRemoveEvent: (id: string) => void;
   onUpdateEvent: (id: string, updates: Partial<VirtualEvent>) => void;
@@ -34,7 +32,6 @@ export default React.memo(function SimulationPanel({
   loading,
   error,
   hasChanges,
-  onSetWeather,
   onAddEvent,
   onRemoveEvent,
   onUpdateEvent,
@@ -49,7 +46,6 @@ export default React.memo(function SimulationPanel({
   setPanelCollapsed,
 }: SimulationPanelProps) {
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    weather: true,
     events: true,
     facilities: false,
     population: false,
@@ -61,7 +57,6 @@ export default React.memo(function SimulationPanel({
 
   const changeCount = useMemo(() => {
     let c = 0;
-    if (scenario.weatherOverride) c++;
     c += scenario.virtualEvents.length;
     c += scenario.closedFacilities.length;
     if (scenario.userCountMultiplier !== 1.0) c++;
@@ -141,13 +136,6 @@ export default React.memo(function SimulationPanel({
           </div>
 
           {/* Sections */}
-          <WeatherSection
-            weather={scenario.weatherOverride}
-            onChange={onSetWeather}
-            expanded={expandedSections.weather}
-            onToggle={() => toggleSection('weather')}
-          />
-
           <EventsSection
             events={scenario.virtualEvents}
             onAdd={onAddEvent}
