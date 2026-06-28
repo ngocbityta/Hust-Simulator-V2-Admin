@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Loader2, BookOpen, Clock, MapPin, Building } from 'lucide-react';
 import { apiFetch } from '../../utils/api';
+import { cleanClassName } from '../../utils/cronHelper';
 
 interface EditRecurringEventModalProps {
   recurringEvent: any | null; // null means Create
@@ -12,7 +13,7 @@ export const EditRecurringEventModal: React.FC<EditRecurringEventModalProps> = (
   const isEditing = !!recurringEvent;
   
   const [formData, setFormData] = useState({
-    name: recurringEvent?.name || '',
+    name: cleanClassName(recurringEvent?.name || ''),
     description: recurringEvent?.description || '',
     mapId: recurringEvent?.mapId || '',
     roomId: recurringEvent?.roomId || '',

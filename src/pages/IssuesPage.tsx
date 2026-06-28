@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFetch } from '../hooks/useFetch';
-import { AlertTriangle, CheckCircle2, Clock, Filter, AlertCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Clock, Filter, AlertCircle, Search } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSearchParams } from 'react-router-dom';
 

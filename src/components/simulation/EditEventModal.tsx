@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Loader2, Calendar as CalendarIcon, MapPin, Building, Users } from 'lucide-react';
 import { apiFetch } from '../../utils/api';
+import { cleanClassName } from '../../utils/cronHelper';
 
 interface EditEventModalProps {
   event: any | null; // null means Create
@@ -12,7 +13,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({ event, onClose, 
   const isEditing = !!event;
   
   const [formData, setFormData] = useState({
-    name: event?.name || '',
+    name: cleanClassName(event?.name || ''),
     description: event?.description || '',
     mapId: event?.mapId || '',
     startTime: event?.startTime ? new Date(event.startTime).toISOString().slice(0, 16) : '',

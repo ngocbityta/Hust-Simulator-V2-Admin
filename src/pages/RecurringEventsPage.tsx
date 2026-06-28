@@ -3,6 +3,7 @@ import { useFetch } from '../hooks/useFetch';
 import { Repeat, Search, Plus, Loader2, Clock } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
 import { EditRecurringEventModal } from '../components/simulation/EditRecurringEventModal';
+import { cronToHumanReadable, cleanClassName } from '../utils/cronHelper';
 
 export const RecurringEventsPage: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
@@ -80,7 +81,7 @@ export const RecurringEventsPage: React.FC = () => {
               <thead>
                 <tr className="text-zinc-500 dark:text-zinc-400 border-b border-zinc-200 dark:border-zinc-800">
                   <th className="pb-4 font-medium px-4">Tên lớp học</th>
-                  <th className="pb-4 font-medium px-4">Lịch (Cron)</th>
+                  <th className="pb-4 font-medium px-4">Lịch diễn ra</th>
                   <th className="pb-4 font-medium px-4">Thời lượng</th>
                   <th className="pb-4 font-medium px-4">Trạng thái</th>
                   <th className="pb-4 font-medium px-4 text-right">Hành động</th>
@@ -95,13 +96,13 @@ export const RecurringEventsPage: React.FC = () => {
                           <Repeat size={18} className="text-purple-500" />
                         </div>
                         <div>
-                          <p className="font-semibold">{event.name || 'Unknown'}</p>
+                          <p className="font-semibold">{cleanClassName(event.name) || 'Unknown'}</p>
                           {event.description && <p className="text-xs text-zinc-500 font-normal">{event.description.substring(0, 30)}{event.description.length > 30 ? '...' : ''}</p>}
                         </div>
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-zinc-500 font-mono text-sm">
-                      {event.cronExpression}
+                    <td className="py-4 px-4 text-zinc-500 font-medium text-sm">
+                      {cronToHumanReadable(event.cronExpression)}
                     </td>
                     <td className="py-4 px-4 text-zinc-500 font-medium">
                       {event.durationMinutes} phút

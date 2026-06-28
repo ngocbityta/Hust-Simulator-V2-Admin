@@ -3,6 +3,7 @@ import { useFetch } from '../hooks/useFetch';
 import { Calendar, Search, Plus, Loader2, Clock } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
 import { EditEventModal } from '../components/simulation/EditEventModal';
+import { cleanClassName } from '../utils/cronHelper';
 
 const formatTime = (timeStr: string) => {
   if (!timeStr) return '--:-- --/--';
@@ -106,7 +107,7 @@ export const EventsPage: React.FC = () => {
                         <div className="w-10 h-10 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
                           <Calendar size={18} className="text-amber-500" />
                         </div>
-                        {event.name || 'Unnamed Event'}
+                        {cleanClassName(event.name) || 'Unnamed Event'}
                       </div>
                     </td>
                     <td className="py-4 px-4 text-zinc-500 font-medium whitespace-nowrap">
