@@ -27,17 +27,10 @@ export const DashboardPage: React.FC = () => {
 
   const totalOnline = heatmapLatest?.totalOnline || 0;
 
-  // Use pre-computed backend data for charts (reset to 0 if system is offline/0 online)
-  const studentBehaviorData = totalOnline > 0
-    ? (d.studentBehaviorDistribution || [])
-    : (d.studentBehaviorDistribution || []).map((item: any) => ({ ...item, value: 0 }));
-
+  // Use pre-computed backend data for charts
+  const studentBehaviorData = d.studentBehaviorDistribution || [];
   const topNodesData = d.topNodes || [];
-
-  const usersPerBuildingData = totalOnline > 0
-    ? (d.usersPerBuilding || [])
-    : (d.usersPerBuilding || []).map((item: any) => ({ ...item, userCount: 0 }));
-
+  const usersPerBuildingData = d.usersPerBuilding || [];
   const heatmapData = d.heatmapDensityTimeline || [];
   return (
     <div className="p-8">
