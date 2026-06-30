@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Trash2, Save, Loader2, User as UserIcon, Upload, Camera } from 'lucide-react';
+import { X, Trash2, Save, Loader2, User as UserIcon, Camera } from 'lucide-react';
 import { apiFetch, uploadFile } from '../../utils/api';
+import { useToast } from '../../contexts/ToastContext';
 
 interface EditUserModalProps {
   user: any | null; // null means Create new user
@@ -9,6 +10,7 @@ interface EditUserModalProps {
 }
 
 export const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onSuccess }) => {
+  const { showToast } = useToast();
   const isEditing = !!user;
   const [formData, setFormData] = useState({
     phonenumber: user?.phonenumber || '',
@@ -61,6 +63,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onS
         });
       }
       onSuccess();
+      showToast(user ? 'Cập nhật người dùng thành công' : 'Tạo người dùng thành công', 'success');
     } catch (err: any) {
       setError(err.message || 'Lỗi khi lưu thông tin');
     } finally {
@@ -81,6 +84,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({ user, onClose, onS
         method: 'DELETE',
       });
       onSuccess();
+      showToast('Đã xóa người dùng', 'success');
     } catch (err: any) {
       setError(err.message || 'Lỗi khi xóa người dùng');
       setIsDeleting(false);

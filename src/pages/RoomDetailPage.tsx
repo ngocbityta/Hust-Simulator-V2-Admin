@@ -14,11 +14,11 @@ export const RoomDetailPage: React.FC = () => {
   const { data: openIssuesCount } = useFetch<number>(`/issues/room/${id}/open-count`);
 
   if (roomLoading) {
-    return <div className="p-8 flex justify-center text-zinc-500"><Loader2 className="animate-spin mr-2"/> Loading room details...</div>;
+    return <div className="p-8 flex justify-center text-zinc-500"><Loader2 className="animate-spin mr-2"/> Đang tải thông tin phòng...</div>;
   }
 
   if (roomError || !room) {
-    return <div className="p-8 text-red-500 text-center">Failed to load room.</div>;
+    return <div className="p-8 text-red-500 text-center">Không thể tải thông tin phòng.</div>;
   }
 
   return (
@@ -66,7 +66,7 @@ export const RoomDetailPage: React.FC = () => {
             <div>
               <div className="text-xs text-zinc-500 mb-1">Tòa nhà</div>
               <Link to={`/buildings/${room.buildingId}`} className="text-sky-400 hover:underline font-mono text-sm">
-                {room.buildingId}
+                {room.buildingId?.substring(0, 8) || '—'}
               </Link>
             </div>
             <div>
@@ -97,7 +97,7 @@ export const RoomDetailPage: React.FC = () => {
                   ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
                   : 'bg-red-500/10 text-red-400 border-red-500/20'
               }`}>
-                {room.status || 'UNKNOWN'}
+                {room.status === 'EMPTY' ? 'Trống' : room.status === 'OCCUPIED' ? 'Đang sử dụng' : room.status || 'UNKNOWN'}
               </span>
             </div>
           </div>

@@ -7,7 +7,7 @@ import maplibregl from 'maplibre-gl';
 import { useHeatmapData } from '../hooks/useHeatmapData';
 import { useSimulation } from '../hooks/useSimulation';
 import { apiFetch } from '../utils/api';
-import type { ViewState, CellData, PoiData, BuildingPolygonData, WayData } from '../types/heatmap';
+import type { ViewState, CellData, PoiData, BuildingPolygonData, WayData, PlayerData } from '../types/heatmap';
 import {
   CAMPUS_POLYGON,
   INITIAL_VIEW_STATE,
@@ -25,6 +25,7 @@ export default function HeatmapViewer() {
 
   const {
     data: observationData,
+    players: wsPlayers,
     selectedCell,
     setSelectedCell,
     loading: obsLoading,
@@ -55,12 +56,17 @@ export default function HeatmapViewer() {
   const [cursor, setCursor] = useState<string>('crosshair');
   const [hoveredBuildingName, setHoveredBuildingName] = useState<string>('');
   const [rawMapStyle, setRawMapStyle] = useState<Record<string, unknown> | null>(null);
+  const [hoveredPlayer, setHoveredPlayer] = useState<PlayerData | null>(null);
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number } | null>(null);
 
   const poisRef = useRef<PoiData[]>([]);
 
   useEffect(() => {
     poisRef.current = pois;
   }, [pois]);
+
+  /* players come from WS heatmap:update — no polling needed */
+  const players = mode === 'observation' ? wsPlayers : [];
 
   // Current display data depends on mode
   const displayData: CellData[] = useMemo(() => {
@@ -290,14 +296,6 @@ export default function HeatmapViewer() {
   /* ── Deck.gl layers ─────────────────────── */
 
   const layers = useMemo(() => {
-    const WORLD_POLYGON: [number, number][] = [
-      [105.7, 21.1],
-      [105.7, 20.9],
-      [106.0, 20.9],
-      [106.0, 21.1],
-      [105.7, 21.1]
-    ];
-
     const layersArray: any[] = [
         new PathLayer({
           id: 'ways-layer',
@@ -411,6 +409,42 @@ export default function HeatmapViewer() {
           filled: true,
         }),
 
+        // ─── 3. Player Dots (on top of heatmap) ───
+        mode === 'observation' && players.length > 0 && new ScatterplotLayer({
+          id: 'player-dots',
+          data: players,
+          pickable: true,
+          getPosition: (d: PlayerData) => [d.longitude, d.latitude],
+          getRadius: Math.max(2, 40 / Math.pow(2, viewState.zoom - 15)),
+          radiusMinPixels: 4,
+          radiusMaxPixels: 20,
+          radiusUnits: 'meters',
+          getFillColor: (d: PlayerData) => {
+            if (d.activityState === 'IN_EVENT' || d.activityState === 'IN_RECURRING_EVENT') return [245, 158, 11, 255];
+            if (d.activityState === 'IN_ROOM' || d.activityState === 'IN_BUILDING') return [56, 189, 248, 255];
+            return [134, 239, 172, 255];
+          },
+          getLineColor: [255, 255, 255, 200],
+          lineWidthMinPixels: 1.5,
+          stroked: true,
+          filled: true,
+          onHover: (info: { object?: PlayerData; x?: number; y?: number }) => {
+            if (info.object) {
+              setHoveredPlayer(info.object);
+              setTooltipPos({ x: info.x ?? 0, y: info.y ?? 0 });
+              setCursor('pointer');
+            } else {
+              setHoveredPlayer(null);
+              setTooltipPos(null);
+              setCursor('crosshair');
+            }
+          },
+          updateTriggers: {
+            getRadius: [viewState.zoom],
+            getFillColor: [],
+          },
+        }),
+
         // ─── Virtual Event Markers (simulation only) ───
         mode === 'simulation' && sim.scenario.virtualEvents.length > 0 &&
         new ScatterplotLayer({
@@ -476,7 +510,7 @@ export default function HeatmapViewer() {
     ];
 
       return layersArray;
-  }, [displayData, selectedCell, setSelectedCell, pois, ways, setSelectedPoi, buildingPolygons, hoveredBuildingName, viewState.zoom, campusPolygon, selectedPoi, mode, closedBuildingIds, sim.scenario.virtualEvents]);
+  }, [displayData, selectedCell, setSelectedCell, pois, ways, setSelectedPoi, buildingPolygons, hoveredBuildingName, viewState.zoom, campusPolygon, selectedPoi, mode, closedBuildingIds, sim.scenario.virtualEvents, players]);
 
   /* ── Map click → find nearest cell or building ── */
   const handleClick = (info: { layer?: { id: string }; coordinate?: number[]; object?: unknown }) => {
@@ -610,6 +644,27 @@ export default function HeatmapViewer() {
         </ReactMap>
       </DeckGL>
 
+      {/* ── Player Hover Tooltip ─────────────── */}
+      {hoveredPlayer && tooltipPos && (
+        <div
+          className="pointer-events-none absolute z-30"
+          style={{ left: tooltipPos.x + 12, top: tooltipPos.y - 36 }}
+        >
+          <div className="flex flex-col bg-zinc-950/90 backdrop-blur-xl border border-white/10 rounded-xl px-3 py-2 shadow-2xl min-w-[120px]">
+            <span className="text-[12px] font-bold text-white leading-tight">{hoveredPlayer.username || hoveredPlayer.userId.slice(0, 8)}</span>
+            <span className="text-[10px] mt-0.5" style={{
+              color: hoveredPlayer.activityState === 'IN_EVENT' || hoveredPlayer.activityState === 'IN_RECURRING_EVENT'
+                ? '#f59e0b'
+                : hoveredPlayer.activityState === 'IN_ROOM' || hoveredPlayer.activityState === 'IN_BUILDING'
+                ? '#38bdf8'
+                : '#86efac'
+            }}>
+              {hoveredPlayer.activityState.replace(/_/g, ' ')}
+            </span>
+          </div>
+        </div>
+      )}
+
       {/* ── Control / Simulation Panel ───────── */}
       {mode === 'observation' ? (
         <>
@@ -622,20 +677,35 @@ export default function HeatmapViewer() {
             </div>
           </div>
 
-          {/* Density Scale minimal at bottom right */}
-          <div className="absolute bottom-6 right-6 z-10 pointer-events-none bg-zinc-950/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-3 shadow-2xl">
-             <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-2 block text-center">
+          {/* Density Scale + Player Legend at bottom right */}
+          <div className="absolute bottom-6 right-6 z-10 pointer-events-none bg-zinc-950/80 backdrop-blur-2xl border border-white/10 rounded-2xl p-3 shadow-2xl flex flex-col gap-2">
+            <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block text-center">
               Mật độ
             </span>
             <div
-              className="h-1.5 w-32 rounded-full opacity-90 shadow-inner mb-1"
+              className="h-1.5 w-32 rounded-full opacity-90 shadow-inner"
               style={{
                 background: 'linear-gradient(90deg, #1e3cb4, #0096dc, #00c8a0, #50d264, #b4dc32, #ffdc00, #ff9600, #dc1e14)',
               }}
             />
-            <div className="flex justify-between px-0.5">
+            <div className="flex justify-between px-0.5 mb-1">
               <span className="text-[8px] font-bold text-zinc-500">Thấp</span>
               <span className="text-[8px] font-bold text-zinc-500">Cao</span>
+            </div>
+            <div className="border-t border-white/10 pt-2 flex flex-col gap-1">
+              <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest block text-center mb-0.5">Người dùng</span>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#86efac] inline-block" />
+                <span className="text-[9px] text-zinc-400">Đang di chuyển</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#38bdf8] inline-block" />
+                <span className="text-[9px] text-zinc-400">Trong phòng / tòa nhà</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#f59e0b] inline-block" />
+                <span className="text-[9px] text-zinc-400">Trong sự kiện</span>
+              </div>
             </div>
           </div>
         </>

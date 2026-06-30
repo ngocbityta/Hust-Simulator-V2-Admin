@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { apiFetch } from '../utils/api';
+import { useToast } from '../contexts/ToastContext';
 import { X, Loader2, Save, Upload, Image as ImageIcon } from 'lucide-react';
 import { uploadFile } from '../utils/api';
 
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export const EditBuildingModal: React.FC<Props> = ({ building, onClose, onSuccess }) => {
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     name: building.name || '',
     category: building.category || 'BUILDING',
@@ -49,6 +51,7 @@ export const EditBuildingModal: React.FC<Props> = ({ building, onClose, onSucces
         body: JSON.stringify(formData),
       });
       onSuccess();
+      showToast('Cập nhật tòa nhà thành công', 'success');
     } catch (err: any) {
       setError(err.message || 'Lỗi khi cập nhật tòa nhà');
     } finally {

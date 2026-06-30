@@ -55,11 +55,11 @@ export const BuildingDetailPage: React.FC = () => {
   const sortedFloors = Object.keys(roomsByFloor).map(Number).sort((a, b) => a - b);
 
   if (buildingLoading) {
-    return <div className="p-8 flex justify-center text-zinc-500"><Loader2 className="animate-spin mr-2"/> Loading building details...</div>;
+    return <div className="p-8 flex justify-center text-zinc-500"><Loader2 className="animate-spin mr-2"/> Đang tải thông tin tòa nhà...</div>;
   }
 
   if (buildingError || !building) {
-    return <div className="p-8 text-red-500 text-center">Failed to load building.</div>;
+    return <div className="p-8 text-red-500 text-center">Không thể tải thông tin tòa nhà.</div>;
   }
 
   return (

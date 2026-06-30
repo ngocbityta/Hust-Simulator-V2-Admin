@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useFetch } from '../hooks/useFetch';
-import { Repeat, Search, Plus, Loader2, Clock } from 'lucide-react';
+import { Repeat, Search, Plus, Loader2 } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
 import { EditRecurringEventModal } from '../components/simulation/EditRecurringEventModal';
 import { cronToHumanReadable, cleanClassName } from '../utils/cronHelper';
@@ -109,11 +109,15 @@ export const RecurringEventsPage: React.FC = () => {
                     </td>
                     <td className="py-4 px-4">
                       <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${
-                        event.status === 'ACTIVE' 
+                        event.status === 'ACTIVE' || event.status === 'ONGOING'
                           ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
-                          : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20'
+                          : event.status === 'SCHEDULED'
+                            ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
+                            : event.status === 'PAUSED'
+                              ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                              : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400 border-zinc-500/20'
                       }`}>
-                        {event.status || 'UNKNOWN'}
+                        {event.status === 'ACTIVE' ? 'Hoạt động' : event.status === 'ONGOING' ? 'Đang diễn ra' : event.status === 'SCHEDULED' ? 'Sắp diễn ra' : event.status === 'PAUSED' ? 'Tạm dừng' : event.status === 'CANCELLED' ? 'Đã hủy' : event.status || 'UNKNOWN'}
                       </span>
                     </td>
                     <td className="py-4 px-4 text-right">

@@ -3,12 +3,14 @@ import { useFetch } from '../hooks/useFetch';
 import { Building2, Search, Plus, Loader2 } from 'lucide-react';
 import { Pagination } from '../components/common/Pagination';
 import { Link } from 'react-router-dom';
+import { CreateBuildingModal } from '../components/CreateBuildingModal';
 
 export const BuildingsPage: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
   const [sortBy, setSortBy] = useState('roomCount,desc');
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const size = 12;
 
   // Debounce search input
@@ -25,7 +27,7 @@ export const BuildingsPage: React.FC = () => {
 
 
   const endpoint = `/buildings/paged?page=${page}&size=${size}&sort=${sortBy}${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ''}`;
-  const { data, error, isLoading } = useFetch<any>(endpoint);
+  const { data, error, isLoading, refetch } = useFetch<any>(endpoint);
   
   const buildings = data?.content || [];
   const totalPages = data?.totalPages || 0;
@@ -41,7 +43,10 @@ export const BuildingsPage: React.FC = () => {
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-2">Quản lý các tòa nhà và địa điểm mô phỏng</p>
         </div>
-        <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-emerald-500/20">
+        <button 
+          onClick={() => setShowCreateModal(true)}
+          className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-emerald-500/20"
+        >
           <Plus size={20} />
           Thêm Tòa nhà
         </button>
@@ -145,6 +150,16 @@ export const BuildingsPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {showCreateModal && (
+        <CreateBuildingModal
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={() => {
+            setShowCreateModal(false);
+            refetch();
+          }}
+        />
+      )}
     </div>
   );
 };

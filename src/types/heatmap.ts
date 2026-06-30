@@ -23,6 +23,7 @@ export interface HeatmapResponse {
   timestamp: number;
   totalOnline: number;
   cells: CellData[];
+  players?: PlayerData[];
   globalReasons?: string[];
   poiReasons?: Record<string, string[]>;
   simulationApplied?: boolean;
@@ -55,6 +56,14 @@ export interface BuildingPolygonData {
   fillColor: [number, number, number, number];
   category: string;
   imageUrl?: string;
+}
+
+export interface PlayerData {
+  userId: string;
+  username: string;
+  latitude: number;
+  longitude: number;
+  activityState: string;
 }
 
 export interface BackendConfig {

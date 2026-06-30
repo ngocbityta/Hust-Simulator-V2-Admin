@@ -51,7 +51,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
           disabled={currentPage === 0}
           className="relative inline-flex items-center rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Previous
+          Trước
         </button>
         <span className="inline-flex items-center text-sm text-zinc-500 dark:text-zinc-400">
           {currentPage + 1} / {totalPages}
@@ -61,7 +61,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
           disabled={currentPage === totalPages - 1}
           className="relative ml-3 inline-flex items-center rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Next
+          Sau
         </button>
       </div>
 
@@ -71,13 +71,13 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {totalElements !== undefined ? (
               <>
-                Showing <span className="font-medium text-zinc-800 dark:text-zinc-200">{startItem}</span> to{' '}
-                <span className="font-medium text-zinc-800 dark:text-zinc-200">{endItem}</span> of{' '}
-                <span className="font-medium text-zinc-800 dark:text-zinc-200">{totalElements}</span> results
+                Hiển thị <span className="font-medium text-zinc-800 dark:text-zinc-200">{startItem}</span> đến{' '}
+                <span className="font-medium text-zinc-800 dark:text-zinc-200">{endItem}</span> trên{' '}
+                <span className="font-medium text-zinc-800 dark:text-zinc-200">{totalElements}</span> kết quả
               </>
             ) : (
               <>
-                Page <span className="font-medium text-zinc-800 dark:text-zinc-200">{currentPage + 1}</span> of{' '}
+                Trang <span className="font-medium text-zinc-800 dark:text-zinc-200">{currentPage + 1}</span> /{' '}
                 <span className="font-medium text-zinc-800 dark:text-zinc-200">{totalPages}</span>
               </>
             )}

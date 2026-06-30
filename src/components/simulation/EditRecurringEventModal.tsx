@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Loader2, BookOpen, Clock, MapPin, Building } from 'lucide-react';
 import { apiFetch } from '../../utils/api';
+import { useToast } from '../../contexts/ToastContext';
 import { cleanClassName } from '../../utils/cronHelper';
 
 interface EditRecurringEventModalProps {
@@ -10,6 +11,7 @@ interface EditRecurringEventModalProps {
 }
 
 export const EditRecurringEventModal: React.FC<EditRecurringEventModalProps> = ({ recurringEvent, onClose, onSuccess }) => {
+  const { showToast } = useToast();
   const isEditing = !!recurringEvent;
   
   const [formData, setFormData] = useState({
@@ -112,6 +114,7 @@ export const EditRecurringEventModal: React.FC<EditRecurringEventModalProps> = (
         });
       }
       onSuccess();
+      showToast(recurringEvent ? 'Cập nhật lớp học thành công' : 'Tạo lớp học thành công', 'success');
     } catch (err: any) {
       setError(err.message || 'Lỗi khi lưu lớp học/sự kiện lặp');
     } finally {
@@ -248,6 +251,7 @@ export const EditRecurringEventModal: React.FC<EditRecurringEventModalProps> = (
                     name="mapId"
                     value={formData.mapId}
                     onChange={handleChange}
+                    required
                     className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none appearance-none"
                   >
                     <option value="">Chọn bản đồ...</option>
@@ -266,6 +270,8 @@ export const EditRecurringEventModal: React.FC<EditRecurringEventModalProps> = (
                       onChange={handleChange}
                       className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white focus:ring-2 focus:ring-indigo-500/50 outline-none appearance-none"
                     >
+                      <option value="SCHEDULED">Sắp diễn ra (SCHEDULED)</option>
+                      <option value="ONGOING">Đang diễn ra (ONGOING)</option>
                       <option value="ACTIVE">Hoạt động (ACTIVE)</option>
                       <option value="PAUSED">Tạm dừng (PAUSED)</option>
                       <option value="CANCELLED">Đã hủy (CANCELLED)</option>

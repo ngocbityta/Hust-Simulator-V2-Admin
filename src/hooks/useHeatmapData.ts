@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import type { CellData, ConnectionStatus, HeatmapResponse } from '../types/heatmap';
+import type { CellData, ConnectionStatus, HeatmapResponse, PlayerData } from '../types/heatmap';
 import { getBackendConfig } from '../utils/heatmapHelpers';
 
 export function useHeatmapData() {
   const [data, setData] = useState<CellData[]>([]);
+  const [players, setPlayers] = useState<PlayerData[]>([]);
   const [totalOnline, setTotalOnline] = useState(0);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [targetDateStr, setTargetDateStr] = useState('');
@@ -34,6 +35,7 @@ export function useHeatmapData() {
 
   const updateState = useCallback((json: HeatmapResponse) => {
     setData(json.cells ?? []);
+    if (json.players) setPlayers(json.players);
     setTotalOnline(json.totalOnline ?? 0);
     setLastUpdated(json.timestamp ? new Date(json.timestamp) : new Date());
     setGlobalReasons(json.globalReasons ?? []);
@@ -158,6 +160,7 @@ export function useHeatmapData() {
 
   return {
     data,
+    players,
     totalOnline,
     lastUpdated,
     targetDateStr,

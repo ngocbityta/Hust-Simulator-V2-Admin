@@ -31,8 +31,16 @@ export function getQuickPicks(): QuickPickItem[] {
 }
 
 export function getBackendConfig(): BackendConfig {
-  const httpBase = import.meta.env.VITE_API_URL || 'https://hustsimulator.id.vn/api';
-  const wsBase = import.meta.env.VITE_WS_URL || 'wss://hustsimulator.id.vn/ws';
+  let httpBase = import.meta.env.VITE_API_URL || 'https://hustsimulator.id.vn/api';
+  let wsBase = import.meta.env.VITE_WS_URL || 'wss://hustsimulator.id.vn/ws';
+
+  // Normalize base URLs to avoid double path segments
+  if (httpBase.endsWith('/api')) {
+    httpBase = httpBase.substring(0, httpBase.length - 4);
+  }
+  if (wsBase.endsWith('/ws')) {
+    wsBase = wsBase.substring(0, wsBase.length - 3);
+  }
 
   return {
     httpBase,

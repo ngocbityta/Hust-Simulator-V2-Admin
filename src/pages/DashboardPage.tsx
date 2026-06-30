@@ -17,7 +17,7 @@ export const DashboardPage: React.FC = () => {
     return (
       <div className="flex justify-center items-center h-full text-zinc-500">
         <Loader2 className="animate-spin mr-3" size={24} />
-        Loading dashboard analytics...
+        Đang tải dữ liệu phân tích...
       </div>
     );
   }
@@ -126,7 +126,7 @@ export const DashboardPage: React.FC = () => {
         <div className="bg-white/50 dark:bg-zinc-900/50 border border-zinc-200/50 dark:border-zinc-800/50 rounded-3xl p-6 shadow-sm backdrop-blur-xl hover:shadow-md transition-shadow duration-300 lg:col-span-1">
           <h2 className="text-lg font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2"><span className="w-2 h-6 rounded-full bg-amber-500"></span>Top 5 Nút giao Đông nhất</h2>
           <div className="space-y-4">
-            {topNodesData.map((item: any, index: number) => (
+            {(topNodesData || []).map((item: any, index: number) => (
               <div key={index} className="flex items-center justify-between p-3.5 rounded-2xl bg-white/60 dark:bg-zinc-950/60 border border-zinc-200/50 dark:border-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800/80 transition-colors shadow-sm">
                 <div>
                   <h3 className="text-zinc-800 dark:text-zinc-200 font-semibold text-sm">{item.name}</h3>

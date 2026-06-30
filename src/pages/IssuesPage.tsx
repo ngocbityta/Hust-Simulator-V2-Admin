@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { useFetch } from '../hooks/useFetch';
 import { AlertTriangle, CheckCircle2, Clock, Filter, AlertCircle, Search } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
+import { apiFetch } from '../utils/api';
 import { useSearchParams } from 'react-router-dom';
+import { Pagination } from '../components/common/Pagination';
 
 interface FacilityIssue {
   id: string;
@@ -18,7 +21,8 @@ interface FacilityIssue {
 }
 
 export const IssuesPage: React.FC = () => {
-  const { token } = useAuth();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const [searchParams] = useSearchParams();
   const initialBuildingId = searchParams.get('buildingId') || '';
   const initialRoomId = searchParams.get('roomId') || '';
@@ -45,18 +49,15 @@ export const IssuesPage: React.FC = () => {
 
   const resolveIssue = async (id: string) => {
     try {
-      const adminId = "00000000-0000-0000-0000-000000000000"; // Mock admin ID for now, since auth doesn't provide user ID in this simple context
-      await fetch(`/api/issues/${id}/status`, {
+      const adminId = user?.id || '';
+      await apiFetch(`/issues/${id}/status`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify({ status: 'RESOLVED', resolvedBy: adminId })
       });
+      showToast('Đã đánh dấu sự cố là đã giải quyết', 'success');
       refetch();
-    } catch (err) {
-      console.error('Failed to resolve issue', err);
+    } catch (err: any) {
+      showToast(err.message || 'Lỗi khi giải quyết sự cố', 'error');
     }
   };
 
@@ -144,14 +145,14 @@ export const IssuesPage: React.FC = () => {
 
               <div className="mt-auto pt-4 border-t border-zinc-200/80 dark:border-zinc-800/50 flex justify-between items-center">
                 <div className="text-sm text-zinc-500 dark:text-zinc-400">
-                  <span className="text-zinc-500">Tòa:</span> {issue.buildingId.substring(0, 8)}
+                  <span className="text-zinc-500">Tòa:</span> {issue.buildingId?.substring(0, 8) || '—'}
                   {issue.roomId && <><span className="text-zinc-500 ml-2">Phòng:</span> {issue.roomId.substring(0, 8)}</>}
                 </div>
                 
                 {issue.status !== 'RESOLVED' && (
                   <button
                     onClick={() => resolveIssue(issue.id)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-100 dark:bg-zinc-800 hover:bg-emerald-500/20 hover:text-emerald-400 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-lg text-sm font-medium"
+                    className="bg-zinc-100 dark:bg-zinc-800 hover:bg-emerald-500/20 hover:text-emerald-400 text-zinc-700 dark:text-zinc-300 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
                   >
                     Đánh dấu xong
                   </button>
@@ -163,26 +164,14 @@ export const IssuesPage: React.FC = () => {
       )}
 
       {/* Pagination */}
-      {data?.totalPages > 1 && (
-        <div className="flex justify-center gap-2 mt-8">
-          <button
-            disabled={page === 0}
-            onClick={() => setPage(p => p - 1)}
-            className="px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 disabled:opacity-50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          >
-            Trước
-          </button>
-          <div className="flex items-center px-4 text-zinc-500 dark:text-zinc-400">
-            Trang {page + 1} / {data.totalPages}
-          </div>
-          <button
-            disabled={page >= data.totalPages - 1}
-            onClick={() => setPage(p => p + 1)}
-            className="px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 disabled:opacity-50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          >
-            Sau
-          </button>
-        </div>
+      {data?.totalPages > 0 && (
+        <Pagination
+          currentPage={page}
+          totalPages={data.totalPages}
+          totalElements={data.totalElements}
+          pageSize={10}
+          onPageChange={setPage}
+        />
       )}
     </div>
   );

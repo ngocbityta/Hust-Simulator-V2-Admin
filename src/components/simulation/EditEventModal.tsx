@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Save, Loader2, Calendar as CalendarIcon, MapPin, Building, Users } from 'lucide-react';
 import { apiFetch } from '../../utils/api';
+import { useToast } from '../../contexts/ToastContext';
 import { cleanClassName } from '../../utils/cronHelper';
 
 interface EditEventModalProps {
@@ -10,6 +11,7 @@ interface EditEventModalProps {
 }
 
 export const EditEventModal: React.FC<EditEventModalProps> = ({ event, onClose, onSuccess }) => {
+  const { showToast } = useToast();
   const isEditing = !!event;
   
   const [formData, setFormData] = useState({
@@ -78,15 +80,18 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({ event, onClose, 
 
       if (isEditing) {
         payload.status = formData.status;
+        if (formData.buildingId) {
+          payload.buildingId = formData.buildingId;
+          payload.roomIds = [];
+        }
       } else {
         payload.type = formData.type;
-      }
-
-      if (formData.type === 'INDOOR' && formData.buildingId) {
-        payload.buildingId = formData.buildingId;
-        payload.roomIds = []; // Optional rooms
-      } else if (formData.type === 'OUTDOOR') {
-        payload.coordinate = { minX: 0, minY: 0, maxX: 0, maxY: 0 }; // Default temp coordinates
+        if (formData.type === 'INDOOR' && formData.buildingId) {
+          payload.buildingId = formData.buildingId;
+          payload.roomIds = [];
+        } else if (formData.type === 'OUTDOOR') {
+          payload.coordinate = { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+        }
       }
 
       if (isEditing) {
@@ -101,6 +106,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({ event, onClose, 
         });
       }
       onSuccess();
+      showToast(event ? 'Cập nhật sự kiện thành công' : 'Tạo sự kiện thành công', 'success');
     } catch (err: any) {
       setError(err.message || 'Lỗi khi lưu sự kiện');
     } finally {
@@ -260,6 +266,7 @@ export const EditEventModal: React.FC<EditEventModalProps> = ({ event, onClose, 
                   name="mapId"
                   value={formData.mapId}
                   onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white focus:ring-2 focus:ring-amber-500/50 outline-none appearance-none"
                 >
                   <option value="">Chọn bản đồ...</option>

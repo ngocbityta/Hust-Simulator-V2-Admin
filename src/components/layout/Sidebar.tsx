@@ -18,6 +18,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', path: '/', icon: BarChart3 },
@@ -38,6 +40,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggleC
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { user: authUser } = useAuth();
+  const { showToast } = useToast();
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
@@ -143,9 +147,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggleC
                 try {
                   const { apiFetch } = await import('../../utils/api');
                   await apiFetch('/prediction-data/train', { method: 'POST' });
-                  alert('Đã gửi lệnh cập nhật trọng số thành công. Quá trình này sẽ chạy ngầm và áp dụng ngay khi hoàn tất.');
-                } catch (e) {
-                  alert('Có lỗi xảy ra khi gửi lệnh: ' + e);
+                  showToast('Đã gửi lệnh cập nhật trọng số thành công. Quá trình sẽ chạy ngầm.', 'success');
+                } catch (e: any) {
+                  showToast(e.message || 'Lỗi khi gửi lệnh cập nhật trọng số', 'error');
                 }
               }
             }}
@@ -175,12 +179,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false, onToggleC
 
           <div className={`flex items-center rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer w-full overflow-hidden ${isCollapsed ? 'justify-center p-2 mt-2' : 'px-3 py-3 mt-1'}`}>
             <div className="w-9 h-9 flex-shrink-0 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-emerald-500/20">
-              A
+              {(authUser?.username || 'A').charAt(0).toUpperCase()}
             </div>
             {!isCollapsed && (
               <div className="ml-3 overflow-hidden">
-                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight truncate">Admin User</p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-0.5 truncate">Superuser</p>
+                <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 leading-tight truncate">{authUser?.username || 'Admin'}</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-0.5 truncate">{authUser?.role === 'ADMIN' ? 'Quản trị viên' : authUser?.role || 'Người dùng'}</p>
               </div>
             )}
           </div>
