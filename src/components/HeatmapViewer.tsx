@@ -415,9 +415,9 @@ export default function HeatmapViewer() {
           data: players,
           pickable: true,
           getPosition: (d: PlayerData) => [d.longitude, d.latitude],
-          getRadius: Math.max(2, 40 / Math.pow(2, viewState.zoom - 15)),
-          radiusMinPixels: 4,
-          radiusMaxPixels: 20,
+          getRadius: Math.max(1, 20 / Math.pow(2, viewState.zoom - 15)),
+          radiusMinPixels: 2,
+          radiusMaxPixels: 10,
           radiusUnits: 'meters',
           getFillColor: (d: PlayerData) => {
             if (d.activityState === 'IN_EVENT' || d.activityState === 'IN_RECURRING_EVENT') return [245, 158, 11, 255];
