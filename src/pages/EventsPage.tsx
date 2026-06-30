@@ -35,7 +35,7 @@ export const EventsPage: React.FC = () => {
   }, [searchInput]);
 
   const endpoint = `/events/paged?page=${page}&size=${size}${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ''}`;
-  const { data, error, isLoading } = useFetch<any>(endpoint);
+  const { data, error, isLoading, refetch } = useFetch<any>(endpoint);
   
   const events = data?.content || [];
   const totalPages = data?.totalPages || 0;
@@ -56,7 +56,7 @@ export const EventsPage: React.FC = () => {
             setEditingEvent(null);
             setIsModalOpen(true);
           }}
-          className="bg-amber-500 hover:bg-amber-600 text-zinc-950 px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-amber-500/20"
+          className="bg-amber-50 hover:bg-amber-600 text-zinc-950 px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-lg shadow-amber-500/20"
         >
           <Plus size={20} />
           Tạo Sự kiện
@@ -194,9 +194,7 @@ export const EventsPage: React.FC = () => {
           onSuccess={() => {
             setEditingEvent(null);
             setIsModalOpen(false);
-            const current = searchInput;
-            setSearchInput(current + ' ');
-            setTimeout(() => setSearchInput(current), 50);
+            refetch();
           }}
         />
       )}

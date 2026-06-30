@@ -25,10 +25,19 @@ export const DashboardPage: React.FC = () => {
   const d = dashboardData || {};
   const u = userStatsData || {};
 
-  // Use pre-computed backend data for charts
-  const studentBehaviorData = d.studentBehaviorDistribution || [];
+  const totalOnline = heatmapLatest?.totalOnline || 0;
+
+  // Use pre-computed backend data for charts (reset to 0 if system is offline/0 online)
+  const studentBehaviorData = totalOnline > 0
+    ? (d.studentBehaviorDistribution || [])
+    : (d.studentBehaviorDistribution || []).map((item: any) => ({ ...item, value: 0 }));
+
   const topNodesData = d.topNodes || [];
-  const usersPerBuildingData = d.usersPerBuilding || [];
+
+  const usersPerBuildingData = totalOnline > 0
+    ? (d.usersPerBuilding || [])
+    : (d.usersPerBuilding || []).map((item: any) => ({ ...item, userCount: 0 }));
+
   const heatmapData = d.heatmapDensityTimeline || [];
   return (
     <div className="p-8">
@@ -53,11 +62,10 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-8">
         <StatCard title="Đang Online" value={heatmapLatest?.totalOnline || 0} />
         <StatCard title="Số tòa nhà" value={d.totalBuildings || 0} />
         <StatCard title="Số phòng" value={d.totalRooms || 0} />
-        <StatCard title="Phòng đang bận" value={d.roomsBusy || 0} />
         <StatCard title="Phòng gặp sự cố" value={d.roomsWithIssues || 0} />
         <StatCard title="Sự kiện hoạt động" value={d.eventsOngoing || 0} />
         <StatCard title="Lớp học hoạt động" value={d.recurringEventsOngoing || 0} />

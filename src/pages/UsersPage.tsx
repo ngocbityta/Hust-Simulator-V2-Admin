@@ -25,7 +25,7 @@ export const UsersPage: React.FC = () => {
   }, [searchInput]);
 
   const endpoint = `/users/paged?page=${page}&size=${size}${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ''}`;
-  const { data, error, isLoading } = useFetch<any>(endpoint);
+  const { data, error, isLoading, refetch } = useFetch<any>(endpoint);
   
   const users = data?.content || [];
   const totalPages = data?.totalPages || 0;
@@ -175,11 +175,7 @@ export const UsersPage: React.FC = () => {
           onSuccess={() => {
             setEditingUser(null);
             setIsModalOpen(false);
-            // Reload page by slightly triggering search or we could add a refetch to useFetch if it returned one.
-            // For now, triggering a tiny timeout search reset
-            const current = searchInput;
-            setSearchInput(current + ' ');
-            setTimeout(() => setSearchInput(current), 50);
+            refetch();
           }}
         />
       )}

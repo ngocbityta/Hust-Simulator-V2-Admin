@@ -9,10 +9,9 @@ export const BuildingDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   
   const [editingBuilding, setEditingBuilding] = useState<any>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   // Building Info
-  const { data: building, isLoading: buildingLoading, error: buildingError } = useFetch<any>(`/buildings/${id}?t=${refreshKey}`);
+  const { data: building, isLoading: buildingLoading, error: buildingError, refetch: refetchBuilding } = useFetch<any>(`/buildings/${id}`);
   
   // Open Issues Count
   const { data: openIssuesCount } = useFetch<number>(`/issues/building/${id}/open-count`);
@@ -196,7 +195,7 @@ export const BuildingDetailPage: React.FC = () => {
           onClose={() => setEditingBuilding(null)}
           onSuccess={() => {
             setEditingBuilding(null);
-            setRefreshKey(k => k + 1);
+            refetchBuilding();
           }}
         />
       )}

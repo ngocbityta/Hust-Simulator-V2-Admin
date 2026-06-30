@@ -24,7 +24,7 @@ export const RecurringEventsPage: React.FC = () => {
   }, [searchInput]);
 
   const endpoint = `/recurring-events/paged?page=${page}&size=${size}${debouncedSearch ? `&search=${encodeURIComponent(debouncedSearch)}` : ''}`;
-  const { data, error, isLoading } = useFetch<any>(endpoint);
+  const { data, error, isLoading, refetch } = useFetch<any>(endpoint);
   
   const events = data?.content || [];
   const totalPages = data?.totalPages || 0;
@@ -160,9 +160,7 @@ export const RecurringEventsPage: React.FC = () => {
           onSuccess={() => {
             setEditingEvent(null);
             setIsModalOpen(false);
-            const current = searchInput;
-            setSearchInput(current + ' ');
-            setTimeout(() => setSearchInput(current), 50);
+            refetch();
           }}
         />
       )}
