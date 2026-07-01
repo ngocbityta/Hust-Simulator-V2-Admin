@@ -26,7 +26,8 @@ export const UserDetailPage: React.FC = () => {
     isLoading,
     predictionResults,
     isPredicting,
-    predictLocation
+    predictLocation,
+    clearPrediction
   } = useUserDetailData(id, activeTab);
 
   return (
@@ -99,6 +100,7 @@ export const UserDetailPage: React.FC = () => {
           predictionResults={predictionResults}
           isPredicting={isPredicting}
           predictLocation={predictLocation}
+          clearPrediction={clearPrediction}
         />
       </div>
     </div>

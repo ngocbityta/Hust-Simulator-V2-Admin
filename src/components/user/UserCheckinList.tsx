@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { MapPin, Loader2, Calendar, Clock } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { MapPin, Loader2, Calendar, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Tab } from '../../hooks/useUserDetailData';
 
 interface UserCheckinListProps {
@@ -29,6 +29,18 @@ export const UserCheckinList: React.FC<UserCheckinListProps> = ({
     return list;
   }, [activeTab, passiveCheckins, activeCheckins, selectedPoiId]);
 
+  // Reset expand state when list source changes
+  const listKey = `${activeTab}-${selectedPoiId}`;
+  const [showAll, setShowAll] = useState(false);
+  const PREVIEW_COUNT = 10;
+
+  useEffect(() => {
+    setShowAll(false);
+  }, [listKey]);
+
+  const visibleList = showAll ? currentList : currentList.slice(0, PREVIEW_COUNT);
+  const hasMore = currentList.length > PREVIEW_COUNT;
+
   return (
     <div className="w-1/3 min-w-[320px] max-w-md bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 flex flex-col">
       <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
@@ -57,7 +69,7 @@ export const UserCheckinList: React.FC<UserCheckinListProps> = ({
         )}
       </div>
       
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar" style={{ scrollbarWidth: 'thin' }}>
         {isLoading ? (
           <div className="flex justify-center items-center py-10 text-zinc-500">
             <Loader2 className="animate-spin mr-2" size={20} />
@@ -68,30 +80,50 @@ export const UserCheckinList: React.FC<UserCheckinListProps> = ({
             Không có dữ liệu check-in nào.
           </div>
         ) : (
-          currentList.map((checkin, idx) => (
-            <div key={checkin.id || idx} className="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-xl p-4 hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors">
-              <h3 className="font-medium text-zinc-900 dark:text-zinc-100 text-base mb-1">
-                {checkin.poi_name}
-              </h3>
-              <div className="flex flex-col gap-1 mt-2">
-                <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-                  <Calendar size={14} />
-                  {new Date(checkin.timestamp).toLocaleString('vi-VN')}
-                </div>
-                {checkin.duration_seconds !== undefined && (
+          <>
+            {visibleList.map((checkin, idx) => (
+              <div key={checkin.id || idx} className="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-xl p-4 hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors">
+                <h3 className="font-medium text-zinc-900 dark:text-zinc-100 text-base mb-1">
+                  {checkin.poi_name}
+                </h3>
+                <div className="flex flex-col gap-1 mt-2">
                   <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-                    <Clock size={14} />
-                    {Math.floor(checkin.duration_seconds / 60)} phút
+                    <Calendar size={14} />
+                    {new Date(checkin.timestamp).toLocaleString('vi-VN')}
+                  </div>
+                  {checkin.duration_seconds !== undefined && (
+                    <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+                      <Clock size={14} />
+                      {Math.floor(checkin.duration_seconds / 60)} phút
+                    </div>
+                  )}
+                </div>
+                {activeTab === 'active' && checkin.journey_id && (
+                  <div className="mt-2 text-xs font-mono text-zinc-400 dark:text-zinc-500 bg-zinc-200 dark:bg-zinc-900 inline-block px-2 py-1 rounded">
+                    Journey: {checkin.journey_id.substring(0, 8)}...
                   </div>
                 )}
               </div>
-              {activeTab === 'active' && checkin.journey_id && (
-                <div className="mt-2 text-xs font-mono text-zinc-400 dark:text-zinc-500 bg-zinc-200 dark:bg-zinc-900 inline-block px-2 py-1 rounded">
-                  Journey: {checkin.journey_id.substring(0, 8)}...
-                </div>
-              )}
-            </div>
-          ))
+            ))}
+            {hasMore && (
+              <button
+                onClick={() => setShowAll(!showAll)}
+                className="w-full flex items-center justify-center gap-1.5 py-2.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors border border-zinc-200 dark:border-zinc-700/50"
+              >
+                {showAll ? (
+                  <>
+                    <ChevronUp size={14} />
+                    Thu gọn
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown size={14} />
+                    Xem thêm ({currentList.length - PREVIEW_COUNT} mục)
+                  </>
+                )}
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>

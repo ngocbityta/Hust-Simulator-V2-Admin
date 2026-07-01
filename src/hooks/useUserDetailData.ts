@@ -128,6 +128,8 @@ export const useUserDetailData = (id: string | undefined, activeTab: Tab) => {
     }
   };
 
+  const clearPrediction = () => setPredictionResults(null);
+
   return {
     passiveDataRaw,
     userData,
@@ -140,6 +142,7 @@ export const useUserDetailData = (id: string | undefined, activeTab: Tab) => {
     isLoading,
     predictionResults,
     isPredicting,
-    predictLocation
+    predictLocation,
+    clearPrediction
   };
 };
