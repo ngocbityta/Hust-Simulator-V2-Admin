@@ -510,7 +510,7 @@ export default function HeatmapViewer() {
     ];
 
       return layersArray;
-  }, [displayData, selectedCell, setSelectedCell, pois, ways, setSelectedPoi, buildingPolygons, hoveredBuildingName, viewState.zoom, campusPolygon, selectedPoi, mode, closedBuildingIds, sim.scenario.virtualEvents, players]);
+  }, [displayData, selectedCell, setSelectedCell, pois, ways, setSelectedPoi, buildingPolygons, hoveredBuildingName, viewState.zoom, campusPolygon, selectedPoi, mode, closedBuildingIds, sim.scenario.virtualEvents, sim.scenario.customBuildings, players]);
 
   /* ── Map click → find nearest cell or building ── */
   const handleClick = (info: { layer?: { id: string }; coordinate?: number[]; object?: unknown }) => {
